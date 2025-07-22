@@ -48,6 +48,11 @@ export interface Pet {
   images: string[];
   ownerId: string;
   isAvailable: boolean;
+  price: number;
+  view: number;
+  location: string;
+  isVerified?: boolean;
+  isFeatured?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

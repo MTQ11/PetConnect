@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Heart, MapPin, Eye } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -27,11 +28,19 @@ export function PetCard({ pet }: PetCardProps) {
     }
 
     return (
-        <div className="overflow-hidden rounded-xl hover:shadow-lg transition-shadow duration-200 relative group">
-            {/* Heart Icon */}
-            <button className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
-                <Heart className="w-4 h-4 text-gray-600 hover:text-red-500 transition-colors" />
-            </button>
+        <Link href={`/pets/${pet.id}`} className="block">
+            <div className="overflow-hidden rounded-xl hover:shadow-lg transition-shadow duration-200 relative group cursor-pointer">
+                {/* Heart Icon */}
+                <button 
+                    className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        // Handle favorite functionality here
+                    }}
+                >
+                    <Heart className="w-4 h-4 text-gray-600 hover:text-red-500 transition-colors" />
+                </button>
 
             {/* Status Badges */}
             <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
@@ -87,6 +96,7 @@ export function PetCard({ pet }: PetCardProps) {
                     </Button>
                 </div>
             </CardContent>
-        </div>
+            </div>
+        </Link>
     )
 }

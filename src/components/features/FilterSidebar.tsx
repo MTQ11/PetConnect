@@ -20,7 +20,7 @@ export function FilterSidebar({
     onClearAll
 }: FilterSidebarProps) {
     return (
-        <div className="w-80 space-y-6">
+        <div className="w-60 space-y-6">
             {/* Active Filters */}
             {activeFilters.length > 0 && (
                 <Card>

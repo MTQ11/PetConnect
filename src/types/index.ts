@@ -100,3 +100,45 @@ export interface SearchFilters {
   maxPrice?: number;
   location?: string;
 }
+
+// Interface cho Pet Form
+export interface PetFormData {
+  // Step 1 - Pet Details
+  name: string
+  type: PetType | ""
+  breed: string
+  age: number | ""
+  ageUnit: "weeks" | "months" | "years"
+  gender: PetGender | ""
+  weight: number | ""
+  color: string
+  healthStatus: HealthStatus | ""
+  
+  // Step 2 - Description & Images
+  description: string
+  images: File[]
+  price: number | ""
+  transactionType: TransactionType | ""
+  
+  // Step 3 - Contact Info
+  ownerName: string
+  email: string
+  phone: string
+  address: string
+  city: string
+  notes: string
+}
+
+// Enum cho đơn vị tuổi
+export enum AgeUnit {
+  WEEKS = "weeks",
+  MONTHS = "months", 
+  YEARS = "years"
+}
+
+// Interface cho City/Location
+export interface City {
+  id: string
+  name: string
+  nameEn: string
+}

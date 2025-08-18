@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { Search, Heart, User } from "lucide-react"
 import { Button } from "@/components/ui/Button"
@@ -5,8 +7,11 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ROUTES } from "@/lib/constants"
 import { t } from "@/lib/i18n"
+import { useAppSelector } from "@/store/hook"
 
 export function Header() {
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,16 +43,25 @@ export function Header() {
               <Heart className="w-4 h-4" />
               <span className="hidden md:inline">{t('favorites')}</span>
             </Button>
-            
-            <Button variant="ghost" size="sm" className="hidden sm:inline-block">
-              {t('login')}
-            </Button>
-            
-            <Button size="sm" className="hidden sm:inline-block">
-              {t('register')}
-            </Button>
-            
-            <Link href={ROUTES.post}>
+
+            {
+              !isAuthenticated &&
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm" className="hidden sm:inline-block">
+                    {t('login')}
+                  </Button>
+                </Link>
+
+                <Link href="/register">
+                  <Button size="sm" className="hidden sm:inline-block">
+                    {t('register')}
+                  </Button>
+                </Link>
+              </>
+            }
+
+            <Link href={ROUTES.createpet}>
               <Button className="bg-orange-500 hover:bg-orange-600 text-sm">
                 <span className="hidden sm:inline">+ </span>{t('postPet')}
               </Button>

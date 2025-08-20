@@ -38,7 +38,7 @@ export const ROUTES = {
   pets: "/pets",
   marketplace: "/marketplace",
   profile: "/profile",
-  post: "/post",
+  createpet: "/createpet",
   auth: {
     login: "/auth/login",
     register: "/auth/register"

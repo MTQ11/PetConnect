@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/Button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Slider } from "@/components/ui/slider"
-import { PetType } from "@/types"
+import { Species } from "@/types"
 import { t } from "@/lib/i18n"
 import { Input } from "../ui/input"
 

@@ -49,11 +49,11 @@ export function PetCard({ pet }: PetCardProps) {
                         {t('verified')}
                     </Badge>
                 )}
-                {pet.isFeatured && (
+                {/* {pet.isFeatured && (
                     <Badge className="bg-green-500 text-white text-xs">
                         {t('featured')}
                     </Badge>
-                )}
+                )} */}
             </div>
 
             {/* Pet Image */}
@@ -76,14 +76,14 @@ export function PetCard({ pet }: PetCardProps) {
                 {/* Pet Info */}
                 <div className="mb-2">
                     <h3 className="font-semibold text-base mb-1">{pet.name}</h3>
-                    <p className="text-xs text-gray-600 mb-1">{pet.breed} / {formatAge(pet.age)}</p>
+                    <p className="text-xs text-gray-600 mb-1">{pet.breed.name_vi} / {formatAge(pet.age)}</p>
                     <p className="text-xs text-gray-500 line-clamp-2">{pet.description}</p>
                 </div>
 
                 {/* Location */}
                 <div className="flex items-center text-xs text-gray-500 mb-2">
                     <MapPin className="w-3 h-3 mr-1" />
-                    <span>{pet.location}</span>
+                    <span>{pet.owner.address}</span>
                 </div>
 
                 {/* Price */}

@@ -5,7 +5,7 @@ export const vi = {
   favorites: "Yêu thích",
   login: "Đăng nhập",
   register: "Đăng ký",
-  postPet: "Đăng tin",
+  postPet: "Thêm thú cưng",
 
   // Categories
   allPets: "Tất cả",
@@ -68,6 +68,7 @@ export const vi = {
 
   // Profile page - Trang cá nhân
   myListings: "Tin đăng của tôi",
+  myPetList: "Thú cưng của tôi",
   favoritesTab: "Yêu thích",
   messages: "Tin nhắn",
   totalPets: "Tổng cộng",
@@ -108,7 +109,7 @@ export const vi = {
   sold: "Đã bán",
 
   // Post Pet Form - Form đăng tin
-  postYourPet: "Đăng tin bán thú cưng",
+  postYourPet: "Thêm thú cưng",
   createDetailedListing: "Tạo tin đăng chi tiết để tìm ngôi nhà hoàn hảo cho thú cưng của bạn",
   stepOf: "Bước",
   complete: "Hoàn thành",
@@ -123,6 +124,7 @@ export const vi = {
   category: "Danh mục",
   selectPetCategory: "Chọn loại thú cưng",
   breed: "Giống",
+  customBreedName: "Nhập giống tùy chọn",
   selectCategoryFirst: "Chọn danh mục trước",
   ageLabel: "Tuổi",
   enterAge: "Nhập tuổi",
@@ -167,6 +169,11 @@ export const vi = {
   contactInformation: "Thông tin liên hệ",
   publishListing: "Đăng tin",
   saveDraft: "Lưu nháp",
+  savePetInfo: "Lưu thông tin thú cưng",
+  
+  // Rehoming
+  findNewOwner: "Bạn có muốn tìm chủ mới cho thú cưng không?",
+  rehomingInfo: "Thông tin tìm chủ mới",
   
   // Health Status Options
   excellent: "Rất tốt",
@@ -230,7 +237,71 @@ export const vi = {
   // Pet status
   available: "Có sẵn",
   pending: "Đang chờ",
-  unavailable: "Không có sẵn"
+  unavailable: "Không có sẵn",
+
+  // Newsfeed/Posts - Bảng tin
+  whatsOnYourMind: "Bạn đang nghĩ gì?",
+  shareYourPet: "Chia sẻ thú cưng của bạn",
+  writePost: "Viết bài đăng...",
+  attachPets: "Đính kèm thú cưng",
+  publish: "Đăng bài",
+  like: "Thích",
+  comment: "Bình luận",
+  share: "Chia sẻ",
+  likes: "lượt thích",
+  comments: "bình luận",
+  shares: "chia sẻ",
+  justNow: "Vừa xong",
+  minutesAgo: "phút trước",
+  seeMore: "Xem thêm",
+  seeLess: "Ẩn bớt",
+  viewPetDetails: "Xem chi tiết thú cưng",
+  writeComment: "Viết bình luận...",
+  newsfeed: "Bảng tin",
+  trending: "Thịnh hành",
+  forYou: "Dành cho bạn",
+  following: "Đang theo dõi",
+  attachedPets: "Thú cưng đính kèm",
+  petCommunity: "Cộng đồng thú cưng",
+  photo: "Ảnh",
+  emotion: "Cảm xúc",
+  locationTag: "Vị trí",
+
+  // Auth pages - Trang xác thực
+  loginPage: "Đăng nhập",
+  registerPage: "Đăng ký",
+  password: "Mật khẩu",
+  fullName: "Họ và tên",
+  confirmPassword: "Xác nhận mật khẩu",
+  rememberMe: "Ghi nhớ đăng nhập",
+  forgotPassword: "Quên mật khẩu?",
+  dontHaveAccount: "Chưa có tài khoản?",
+  alreadyHaveAccount: "Đã có tài khoản?",
+  loginWithZalo: "Đăng nhập với Zalo",
+  quickRegisterWithZalo: "Đăng ký nhanh với Zalo",
+  orContinueWith: "Hoặc tiếp tục với",
+  byRegisteringYouAgree: "Bằng việc đăng ký, bạn đồng ý với",
+  and: "và",
+  welcomeBack: "Chào mừng trở lại!",
+  createAccount: "Tạo tài khoản mới",
+  joinPetCommunity: "Tham gia cộng đồng thú cưng",
+  emailPlaceholder: "Nhập email của bạn",
+  passwordPlaceholder: "Nhập mật khẩu",
+  fullNamePlaceholder: "Nhập họ và tên",
+  phonePlaceholder: "Nhập số điện thoại",
+  invalidEmail: "Email không hợp lệ",
+  passwordTooShort: "Mật khẩu phải có ít nhất 6 ký tự",
+  passwordNotMatch: "Mật khẩu không khớp",
+  fieldRequired: "Trường này bắt buộc",
+  loginSuccess: "Đăng nhập thành công!",
+  registerSuccess: "Đăng ký thành công!",
+  loginFailed: "Đăng nhập thất bại",
+  registerFailed: "Đăng ký thất bại",
+  resetPassword: "Đặt lại mật khẩu",
+  newPassword: "Mật khẩu mới",
+  enterVerificationCode: "Nhập mã xác thực",
+  verificationCodeSent: "Mã xác thực đã được gửi",
+  resendCode: "Gửi lại mã"
 }
 
 // Bản dịch tiếng Anh (sẽ được thêm sau)

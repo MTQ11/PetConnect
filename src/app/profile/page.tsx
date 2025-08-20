@@ -177,7 +177,7 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row lg:flex-col gap-2">
-              <Link href={ROUTES.post}>
+              <Link href={ROUTES.createpet}>
                 <Button className="bg-gray-900 hover:bg-gray-800 w-full sm:w-auto">
                   + {t('postNewPet')}
                 </Button>
@@ -192,24 +192,27 @@ export default function ProfilePage() {
 
       {/* Tabs */}
       <Tabs defaultValue="listings" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="listings" className="text-center">
-            {t('myListings')} (4)
+            {t('myListings')}
+          </TabsTrigger>
+          <TabsTrigger value="petlist" className="text-center">
+            {t('myPetList')}
           </TabsTrigger>
           <TabsTrigger value="favorites" className="text-center">
-            {t('favoritesTab')} (3)
+            {t('favoritesTab')}
           </TabsTrigger>
           <TabsTrigger value="messages" className="text-center">
-            {t('messages')} (1)
+            {t('messages')}
           </TabsTrigger>
         </TabsList>
 
-        {/* My Listings Tab */}
-        <TabsContent value="listings">
+        {/* My Pet Listings Tab */}
+        <TabsContent value="petlist">
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h2 className="text-lg font-semibold">My Pet Listings</h2>
-              <Link href={ROUTES.post}>
+              <Link href={ROUTES.createpet}>
                 <Button className="bg-gray-900">+ {t('addNewPet')}</Button>
               </Link>
             </div>

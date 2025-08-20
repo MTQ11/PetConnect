@@ -1,11 +1,11 @@
-"use client"
-
 import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './slices/authSlice'
+import speciesSlice from './slices/speciesSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authSlice,
+    species: speciesSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

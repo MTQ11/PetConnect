@@ -1,12 +1,15 @@
 // Enum cho loại thú cưng
-export enum PetType {
-  DOG = "dog",
-  CAT = "cat",
-  BIRD = "bird",
-  FISH = "fish",
-  RABBIT = "rabbit",
-  HAMSTER = "hamster",
-  OTHER = "other"
+export interface Species {
+  id: string;
+  name_vi: string;
+  name_en: string
+}
+
+export interface Breeds {
+  id: string;
+  name_vi: string;
+  name_en: string;
+  speciesId: string;
 }
 
 // Enum cho giới tính thú cưng
@@ -26,6 +29,7 @@ export enum HealthStatus {
 
 // Enum cho loại giao dịch
 export enum TransactionType {
+  NOT_SELL = "not_sell",
   SELL = "sell",
   EXCHANGE = "exchange",
   ADOPT = "adopt",
@@ -37,24 +41,26 @@ export enum TransactionType {
 export interface Pet {
   id: string;
   name: string;
-  type: PetType;
-  breed: string;
+  species: Species;
+  breed: Breeds;
   age: number;
   gender: PetGender;
   color: string;
   weight: number;
-  healthStatus: HealthStatus;
+  // healthStatus: HealthStatus;
   description: string;
   images: string[];
   ownerId: string;
+  owner: User;
   isAvailable: boolean;
   price: number;
+  rating: number;
   view: number;
-  location: string;
+  // location: string;
   isVerified?: boolean;
-  isFeatured?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  // isFeatured?: boolean;
+  // createdAt: Date;
+  // updatedAt: Date;
 }
 
 // Interface cho User
@@ -67,6 +73,7 @@ export interface User {
   address?: string;
   verified: boolean;
   pets: Pet[];
+  rating: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -90,7 +97,7 @@ export interface MarketplaceListing {
 
 // Interface cho Search Filters
 export interface SearchFilters {
-  type?: PetType;
+  type?: Species;
   breed?: string;
   minAge?: number;
   maxAge?: number;
@@ -105,7 +112,7 @@ export interface SearchFilters {
 export interface PetFormData {
   // Step 1 - Pet Details
   name: string
-  type: PetType | ""
+  type: Species | ""
   breed: string
   age: number | ""
   ageUnit: "weeks" | "months" | "years"
@@ -141,4 +148,39 @@ export interface City {
   id: string
   name: string
   nameEn: string
+}
+
+// Interface cho Post/Newsfeed
+export interface Post {
+  id: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+    verified: boolean;
+  };
+  content: string;
+  images?: string[];
+  attachedPets: Pet[];
+  likes: number;
+  comments: number;
+  shares: number;
+  isLiked: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Interface cho Comment
+export interface Comment {
+  id: string;
+  postId: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  content: string;
+  createdAt: Date;
 }

@@ -6,6 +6,8 @@ export const vi = {
   login: "Đăng nhập",
   register: "Đăng ký",
   postPet: "Thêm thú cưng",
+  marketplace: "Chợ thú cưng",
+  profile: "Trang cá nhân",
 
   // Categories
   allPets: "Tất cả",

@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 import { Pet, Species, PetGender, HealthStatus } from "@/types"
 import { t } from "@/lib/i18n"
+import api from "@/lib/api/axios"
 
 export default function PetDetailPage() {
   const params = useParams()
@@ -92,9 +93,8 @@ export default function PetDetailPage() {
   useEffect(() => {
     const fetchPetDetail = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/pets/${params.id}`)
-        const data = await response.json()
-        setPetDetail(data)
+        const response = await api.get(`/pets/${params.id}`)
+        setPetDetail(response.data)
       } catch (error) {
         console.error('Error fetching pet detail:', error)
       }
@@ -106,13 +106,8 @@ export default function PetDetailPage() {
   useEffect(() => {
     const fetchSimilarPets = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/pets?similarTo=${petDetail.breed.id}`, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-        const data = await response.json()
-        setSimilarPets(data)
+        const response = await api.get(`/pets?similarTo=${petDetail.breed.id}`)
+        setSimilarPets(response.data)
       } catch (error) {
         console.log(error)
       }

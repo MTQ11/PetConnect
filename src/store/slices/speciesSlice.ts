@@ -1,37 +1,27 @@
+import api from "@/lib/api/axios";
 import { Breeds, Species } from "@/types";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const getSpecies = createAsyncThunk(
     'species/getSpecies',
     async () => {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        const response = await fetch('http://localhost:3001/species', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        if (!response.ok) {
+        const response = await api.get('/species')
+
+        if (!(response.status >= 200 && response.status < 300)) {
             throw new Error('Failed to fetch species')
         }
-        const data = await response.json()
-        return data
+        return response.data
     }
 )
 
 export const getBreeds = createAsyncThunk(
     'species/getBreeds',
     async (speciesId: string) => {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        const response = await fetch(`http://localhost:3001/breeds?speciesId=${speciesId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        if (!response.ok) {
+        const response = await api.get(`/breeds?speciesId=${speciesId}`)
+        if (!(response.status >= 200 && response.status < 300)) {
             throw new Error('Failed to fetch breeds')
         }
-        const data = await response.json()
-        return { speciesId, breeds: data }
+        return { speciesId, breeds: response.data }
     }
 )
 

@@ -1,3 +1,4 @@
+import api from "@/lib/api/axios";
 import { User } from "@/types";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -5,27 +6,19 @@ export const loginUser = createAsyncThunk(
     'auth/login',
     async (credentials: { username: string, password: string, rememberMe: boolean }, { rejectWithValue }) => {
         try {
-            const response = await fetch('http://localhost:3001/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
-            });
+            const response = await api.post('/auth/login', credentials);
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                return rejectWithValue({ error: data?.message || 'Đăng nhập thất bại' });
+            if (!(response.status >= 200 && response.status < 300)) {
+                return rejectWithValue({ error: response.data?.message || 'Đăng nhập thất bại' });
             }
 
             const storage = credentials.rememberMe ? localStorage : sessionStorage;
-            storage.setItem('accessToken', data.access_token);
-            if (data.refresh_token) {
-                storage.setItem('refreshToken', data.refresh_token);
+            storage.setItem('accessToken', response.data.access_token);
+            if (response.data.refresh_token) {
+                storage.setItem('refreshToken', response.data.refresh_token);
             }
 
-            return data;
+            return response.data;
         } catch (error: any) {
             return rejectWithValue({ error: error?.message || 'Đăng nhập thất bại' });
         }
@@ -47,7 +40,7 @@ export const logoutUser = createAsyncThunk(
         sessionStorage.removeItem('accessToken')
         sessionStorage.removeItem('refreshToken')
 
-        await fetch('http://localhost:3001/auth/logout', { method: 'POST' })
+        await api.post('/auth/logout');
     }
 )
 
@@ -55,18 +48,12 @@ export const checkAuthStatus = createAsyncThunk(
     'auth/checkStatus',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            if (!token) {
-                return rejectWithValue({ error: 'Not found token' });
+            const response = await api.get('/auth/me');
+
+            if (!(response.status >= 200 && response.status < 300)) {
+                return rejectWithValue({ error: response.data?.message || 'Failed to fetch user data' });
             }
-            const response = await fetch('http://localhost:3001/auth/me', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                return rejectWithValue({ error: data?.message || 'Failed to fetch user data' });
-            }
-            return data;
+            return response.data;
         } catch (error: any) {
             return rejectWithValue({ error: error?.message || 'Failed to fetch user data' });
         }

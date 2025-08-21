@@ -15,6 +15,7 @@ import { t } from "@/lib/i18n"
 import { useAppDispatch, useAppSelector } from "@/store/hook"
 import { getSpecies, getBreeds } from "@/store/slices/speciesSlice"
 import { useBreedsData, useSpeciesData } from "@/lib/hooks/useSpeciesData"
+import api from "@/lib/api/axios"
 
 enum AgeUnit {
     YEAR = 'year',
@@ -136,15 +137,7 @@ export default function CreatePetPage() {
 
             const payload = {...formData, images: uploadedUrls}
 
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            fetch('http://localhost:3001/pets', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
-            })
+            api.post('/pets', payload)
 
         } catch (error) {
             console.error(error)

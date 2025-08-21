@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Pet, Species, PetGender, HealthStatus, SearchFilters } from "@/types"
 import { t } from "@/lib/i18n"
+import api from "@/lib/api/axios"
 
 export default function MarketplacePage() {
   const [activeFilters, setActiveFilters] = useState<string[]>([])
@@ -26,14 +27,8 @@ export default function MarketplacePage() {
   useEffect(() => {
     const fetchPets = async () => {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('accessToken')
-        const response = await fetch('http://localhost:3001/pets', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        const data = await response.json()
-        setPets(data)
+        const response = await api.get('/pets')
+        setPets(response.data)
       } catch (error) {
         console.error('Error fetching pets:', error)
       }

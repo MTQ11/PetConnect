@@ -65,6 +65,7 @@ export const vi = {
   next: "Tiếp theo",
   years: "năm",
   months: "tháng",
+  weeks: "tuần",
   male: "Đực",
   female: "Cái",
 

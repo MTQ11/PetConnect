@@ -8,96 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Heart, MessageCircle, Eye, MoreHorizontal, Star } from "lucide-react"
 import { ROUTES } from "@/lib/constants"
 import { t } from "@/lib/i18n"
+import { useEffect, useState } from "react"
+import api from "@/lib/api/axios"
+import { AgeUnit, Pet } from "@/types"
+import { formatDistanceToNow } from "date-fns"
+import { PetCard } from "@/components/features/PetCard"
 
 // Mock data
-const mockPets = [
-  {
-    id: "1",
-    name: "Max",
-    breed: "Golden Retriever",
-    age: "2 years",
-    price: 1200,
-    image: "/api/placeholder/80/80",
-    postedTime: "2 days ago",
-    views: 156,
-    favorites: 12,
-    messages: 8,
-    status: "active"
-  },
-  {
-    id: "2", 
-    name: "Luna",
-    breed: "Persian Cat",
-    age: "1 year",
-    price: 800,
-    image: "/api/placeholder/80/80",
-    postedTime: "1 week ago",
-    views: 89,
-    favorites: 7,
-    messages: 3,
-    status: "active"
-  },
-  {
-    id: "3",
-    name: "Charlie",
-    breed: "French Bulldog", 
-    age: "6 months",
-    price: 2500,
-    image: "/api/placeholder/80/80",
-    postedTime: "2 weeks ago",
-    views: 234,
-    favorites: 18,
-    messages: 15,
-    status: "sold"
-  },
-  {
-    id: "4",
-    name: "Buddy",
-    breed: "Labrador Mix",
-    age: "3 years", 
-    price: 600,
-    image: "/api/placeholder/80/80",
-    postedTime: "1 month ago",
-    views: 178,
-    favorites: 9,
-    messages: 6,
-    status: "sold"
-  }
-]
-
-const favoritePets = [
-  {
-    id: "1",
-    name: "Bella",
-    breed: "Husky",
-    age: "2 years",
-    price: 1500,
-    location: "Brooklyn, NY",
-    image: "/api/placeholder/120/120",
-    favorited: "3 days ago"
-  },
-  {
-    id: "2",
-    name: "Oscar", 
-    breed: "Ragdoll",
-    age: "1 year",
-    price: 900,
-    location: "Queens, NY",
-    image: "/api/placeholder/120/120",
-    favorited: "1 week ago"
-  },
-  {
-    id: "3",
-    name: "Ruby",
-    breed: "Beagle",
-    age: "4 months", 
-    price: 1000,
-    location: "Manhattan, NY",
-    image: "/api/placeholder/120/120",
-    favorited: "2 weeks ago"
-  }
-]
-
 const messages = [
   {
     id: "1",
@@ -109,7 +26,7 @@ const messages = [
     unread: true
   },
   {
-    id: "2", 
+    id: "2",
     senderName: "Emily Davis",
     senderAvatar: "/api/placeholder/40/40",
     petName: "Luna",
@@ -119,7 +36,7 @@ const messages = [
   },
   {
     id: "3",
-    senderName: "Michael Brown", 
+    senderName: "Michael Brown",
     senderAvatar: "/api/placeholder/40/40",
     petName: "Max",
     message: "Can we schedule a meetup this weekend?",
@@ -129,6 +46,47 @@ const messages = [
 ]
 
 export default function ProfilePage() {
+  const [myPets, setMyPets] = useState<Pet[]>([])
+  const [myFavoritePets, setMyFavoritePets] = useState<Pet[]>([])
+  const [myListings, setMyListings] = useState<Pet[]>([])
+  const [selectedTab, setSelectedTab] = useState("listings")
+
+  const handleLikeChangeOnProfile = (petId: string, isLiked: boolean) => {
+    setMyFavoritePets((prevFavorites) =>
+      prevFavorites.map(pet =>
+        pet.id === petId ? { ...pet, isLiked } : pet
+      )
+    )
+  }
+
+  useEffect(() => {
+    switch (selectedTab) {
+      case "listings":
+        const fetchPostListings = async () => {
+          const response = await api.get('/pets/listings')
+          setMyListings(response.data)
+        }
+        fetchPostListings()
+        break
+      case "petlist":
+        const fetchMyPets = async () => {
+          const response = await api.get('/pets/personal')
+          setMyPets(response.data)
+        }
+        fetchMyPets()
+        break
+      case "favorites":
+        const fetchMyFavorites = async () => {
+          const response = await api.get('/pets/favorite')
+          setMyFavoritePets(response.data)
+        }
+        fetchMyFavorites()
+        break
+      default:
+        break
+    }
+  }, [selectedTab])
+
   return (
     <Layout maxWidth="xl">
       {/* Profile Header */}
@@ -160,7 +118,7 @@ export default function ProfilePage() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex flex-col lg:items-end gap-4">
             <div className="flex justify-center lg:justify-end gap-8 text-center">
               <div>
@@ -191,7 +149,11 @@ export default function ProfilePage() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="listings" className="w-full">
+      <Tabs
+        defaultValue="listings"
+        value={selectedTab}
+        onValueChange={setSelectedTab}
+        className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="listings" className="text-center">
             {t('myListings')}
@@ -216,43 +178,43 @@ export default function ProfilePage() {
                 <Button className="bg-gray-900">+ {t('addNewPet')}</Button>
               </Link>
             </div>
-            
+
             <div className="space-y-3">
-              {mockPets.map((pet) => (
+              {myPets.map((pet) => (
                 <div key={pet.id} className="bg-white p-4 rounded-lg shadow-sm border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4 flex-1">
-                    <img 
-                      src={pet.image} 
+                    <img
+                      src={pet.images[0] || "/api/placeholder/80/80"}
                       alt={pet.name}
                       className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold">{pet.name}</h3>
-                      <p className="text-sm text-gray-600">{pet.breed} • {pet.age}</p>
+                      <p className="text-sm text-gray-600">{pet.breed.name_vi} • {pet.age} {pet.ageUnit == AgeUnit.YEAR ? t('years') : pet.ageUnit == AgeUnit.MONTH ? t('months') : t('weeks')}</p>
                       <p className="text-lg font-bold">${pet.price.toLocaleString()}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full sm:w-auto">
                     <div className="text-sm text-gray-500">
-                      <span>{t('postedAgo')} {pet.postedTime}</span>
+                      <span>{t('postedAgo')} {formatDistanceToNow(new Date(pet.createdAt), { addSuffix: true })}</span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <Eye className="w-4 h-4" />
-                        <span>{pet.views} {t('views')}</span>
+                        <span>{pet.view} {t('views')}</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      {/* <div className="flex items-center gap-1">
                         <Heart className="w-4 h-4" />
                         <span>{pet.favorites} {t('favorites_count')}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
+                      </div> */}
+                      {/* <div className="flex items-center gap-1">
                         <MessageCircle className="w-4 h-4" />
                         <span>{pet.messages} {t('messages_count')}</span>
-                      </div>
+                      </div> */}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge 
+                    {/* <div className="flex items-center gap-2">
+                      <Badge
                         className={pet.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
                       >
                         {pet.status === 'active' ? t('active') : t('sold')}
@@ -260,7 +222,7 @@ export default function ProfilePage() {
                       <Button variant="ghost" size="sm">
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               ))}
@@ -273,31 +235,8 @@ export default function ProfilePage() {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Favorite Pets</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {favoritePets.map((pet) => (
-                <div key={pet.id} className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                  <div className="relative">
-                    <img 
-                      src={pet.image} 
-                      alt={pet.name}
-                      className="w-full h-48 object-cover"
-                    />
-                    <button className="absolute top-3 right-3 p-2 bg-white/80 rounded-full">
-                      <Heart className="w-4 h-4 fill-red-500 text-red-500" />
-                    </button>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold mb-1">{pet.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{pet.breed} • {pet.age}</p>
-                    <p className="text-lg font-bold mb-2">${pet.price.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500 mb-3">📍 {pet.location}</p>
-                    <p className="text-xs text-gray-500">Favorited {pet.favorited}</p>
-                    <div className="flex justify-between items-center mt-3">
-                      <Button variant="outline" size="sm">
-                        {t('remove')}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+              {myFavoritePets.map((pet) => (
+                <PetCard key={pet.id} pet={pet} onLikeChange={(petId, isLiked) => handleLikeChangeOnProfile(petId, isLiked)} />
               ))}
             </div>
           </div>
@@ -312,8 +251,8 @@ export default function ProfilePage() {
                 <div key={message.id} className="bg-white p-4 rounded-lg shadow-sm border">
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1">
-                      <img 
-                        src={message.senderAvatar} 
+                      <img
+                        src={message.senderAvatar}
                         alt={message.senderName}
                         className="w-10 h-10 rounded-full flex-shrink-0"
                       />

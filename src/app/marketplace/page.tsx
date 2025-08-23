@@ -10,11 +10,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Pet, Species, PetGender, HealthStatus, SearchFilters } from "@/types"
 import { t } from "@/lib/i18n"
 import api from "@/lib/api/axios"
+import { useDispatch } from "react-redux"
+import { useAppDispatch, useAppSelector } from "@/store/hook"
+import { getPets } from "@/store/slices/marketplaceSlice"
 
 export default function MarketplacePage() {
-  const [activeFilters, setActiveFilters] = useState<string[]>([])
+  const { pets, isLoading, error } = useAppSelector((state) => state.marketplace)
+  const dispatch = useAppDispatch()
 
-  const [pets, setPets] = useState<Pet[]>([])
+  const [activeFilters, setActiveFilters] = useState<string[]>([])
 
   const handleRemoveFilter = (filter: string) => {
     setActiveFilters(prev => prev.filter(f => f !== filter))
@@ -25,16 +29,7 @@ export default function MarketplacePage() {
   }
 
   useEffect(() => {
-    const fetchPets = async () => {
-      try {
-        const response = await api.get('/pets')
-        setPets(response.data)
-      } catch (error) {
-        console.error('Error fetching pets:', error)
-      }
-    }
-
-    fetchPets()
+    dispatch(getPets())
   }, [])
 
   return (

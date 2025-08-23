@@ -173,7 +173,7 @@ export function PostCard({ post }: PostCardProps) {
                         {pet.name}
                       </p>
                       <p className="text-xs text-gray-500 truncate">
-                        {pet.breed}
+                        {pet.breed.name_vi}
                       </p>
                       {pet.price && (
                         <p className="text-xs font-medium text-green-600 mt-0.5">

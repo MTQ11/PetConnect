@@ -44,6 +44,7 @@ export interface Pet {
   species: Species;
   breed: Breeds;
   age: number;
+  ageUnit: AgeUnit;
   gender: PetGender;
   color: string;
   weight: number;
@@ -59,8 +60,9 @@ export interface Pet {
   // location: string;
   isVerified?: boolean;
   // isFeatured?: boolean;
-  // createdAt: Date;
-  // updatedAt: Date;
+  isLiked: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Interface cho User
@@ -120,13 +122,13 @@ export interface PetFormData {
   weight: number | ""
   color: string
   healthStatus: HealthStatus | ""
-  
+
   // Step 2 - Description & Images
   description: string
   images: File[]
   price: number | ""
   transactionType: TransactionType | ""
-  
+
   // Step 3 - Contact Info
   ownerName: string
   email: string
@@ -138,9 +140,9 @@ export interface PetFormData {
 
 // Enum cho đơn vị tuổi
 export enum AgeUnit {
-  WEEKS = "weeks",
-  MONTHS = "months", 
-  YEARS = "years"
+  YEAR = 'year',
+  MONTH = 'month',
+  WEEK = 'week'
 }
 
 // Interface cho City/Location

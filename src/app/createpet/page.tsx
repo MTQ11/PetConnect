@@ -10,18 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { X, Camera } from "lucide-react"
-import { Species, PetGender, HealthStatus, TransactionType, Breeds } from "@/types"
+import { Species, PetGender, HealthStatus, TransactionType, Breeds, AgeUnit } from "@/types"
 import { t } from "@/lib/i18n"
 import { useAppDispatch, useAppSelector } from "@/store/hook"
 import { getSpecies, getBreeds } from "@/store/slices/speciesSlice"
 import { useBreedsData, useSpeciesData } from "@/lib/hooks/useSpeciesData"
 import api from "@/lib/api/axios"
-
-enum AgeUnit {
-    YEAR = 'year',
-    MONTH = 'month',
-    WEEK = 'week'
-}
 
 interface PetFormData {
     name: string
@@ -49,34 +43,24 @@ interface PetFormData {
     // notes: string
 }
 
-const initialFormData: PetFormData = {
-    name: "",
-    age: "",
-    ageUnit: AgeUnit.MONTH,
-    gender: "",
-    weight: "",
-    // color: "",
-    // healthStatus: "",
-    description: "",
-    images: [],
-    speciesId: "",
-    breedId: "",
-    customBreedName: "",
-    isForRehoming: false,
-    price: 0,
-    transactionType: TransactionType.NOT_SELL,
-    // ownerName: "",
-    // email: "",
-    // phone: "",
-    // address: "",
-    // city: "",
-    // notes: ""
-}
-
 export default function CreatePetPage() {
-    const [formData, setFormData] = useState<PetFormData>(initialFormData)
-    const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([])
+    const [formData, setFormData] = useState<PetFormData>({
+        name: "",
+        age: "",
+        ageUnit: AgeUnit.MONTH,
+        gender: "",
+        weight: "",
+        description: "",
+        images: [],
+        speciesId: "",
+        breedId: "",
+        customBreedName: "",
+        isForRehoming: false,
+        price: 0,
+        transactionType: TransactionType.NOT_SELL,
+    })
 
+    const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([])
     const { species, loading: speciesLoading } = useSpeciesData()
     const { breeds, loading: breedsLoading } = useBreedsData(formData.speciesId)
 
@@ -135,7 +119,7 @@ export default function CreatePetPage() {
                 formData.images.map(file => imageUploadToCloudinary(file))
             );
 
-            const payload = {...formData, images: uploadedUrls}
+            const payload = { ...formData, images: uploadedUrls }
 
             api.post('/pets', payload)
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Layout } from "@/components/layout/Layout"
 import { PostCard } from "@/components/features/PostCard"
 import { CreatePost } from "@/components/features/CreatePost"
@@ -9,6 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TrendingUp, Users, Heart } from "lucide-react"
 import { Post, Species, PetGender, HealthStatus } from "@/types"
 import { t } from "@/lib/i18n"
+import { useAppDispatch, useAppSelector } from "@/store/hook"
+import { getAllPost } from "@/store/slices/newfeedSlice"
+import { useMyPetsData } from "@/lib/hooks/useMyPetsData"
+import api from "@/lib/api/axios"
 
 // Mock data cho posts
 const mockPosts: Post[] = [
@@ -147,7 +151,16 @@ const mockPosts: Post[] = [
 ]
 
 export default function HomePage() {
+  const dispatch = useAppDispatch()
+  const { posts, status, error: errorPosts } = useAppSelector(state => state.newfeed)
+
+  const { myPets, loading, error: errorMyPets } = useMyPetsData();
+
   const [activeTab, setActiveTab] = useState("forYou")
+
+  useEffect(() => {
+    dispatch(getAllPost())
+  }, [dispatch])
 
   return (
     <Layout maxWidth="lg">
@@ -184,19 +197,19 @@ export default function HomePage() {
 
             <TabsContent value="forYou" className="space-y-0">
               {/* Create Post */}
-              <CreatePost />
+              <CreatePost myPets={myPets} />
 
               {/* Posts Feed */}
               <div className="space-y-4">
-                {mockPosts.map((post) => (
-                  <PostCard key={post.id} post={post} />
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} isDetail={false} />
                 ))}
               </div>
             </TabsContent>
 
             <TabsContent value="following" className="space-y-0">
-              <CreatePost />
-              
+              <CreatePost myPets={myPets} />
+
               <div className="text-center py-12">
                 <Users className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">

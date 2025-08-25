@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hook"
 import { getSpecies, getBreeds } from "@/store/slices/speciesSlice"
 import { useBreedsData, useSpeciesData } from "@/lib/hooks/useSpeciesData"
 import api from "@/lib/api/axios"
+import { imageUploadToCloudinary } from "@/lib/utils/fetchCloudinary"
 
 interface PetFormData {
     name: string
@@ -92,24 +93,6 @@ export default function CreatePetPage() {
         URL.revokeObjectURL(imagePreviewUrls[index])
         setImagePreviewUrls(newPreviewUrls)
         updateFormData('images', newImages)
-    }
-
-    const imageUploadToCloudinary = async (file: File): Promise<string> => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", "petconnect");
-
-        const response = await fetch("https://api.cloudinary.com/v1_1/dhtjhpibu/image/upload", {
-            method: "POST",
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to upload image");
-        }
-
-        const data = await response.json();
-        return data.secure_url;
     }
 
     const handleSubmit = async (e: React.FormEvent) => {

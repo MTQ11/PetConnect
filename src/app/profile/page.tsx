@@ -10,9 +10,11 @@ import { ROUTES } from "@/lib/constants"
 import { t } from "@/lib/i18n"
 import { useEffect, useState } from "react"
 import api from "@/lib/api/axios"
-import { AgeUnit, Pet } from "@/types"
+import { AgeUnit, Pet, Post } from "@/types"
 import { formatDistanceToNow } from "date-fns"
 import { PetCard } from "@/components/features/PetCard"
+import { useMyPetsData } from "@/lib/hooks/useMyPetsData"
+import { PostCard } from "@/components/features/PostCard"
 
 // Mock data
 const messages = [
@@ -46,10 +48,10 @@ const messages = [
 ]
 
 export default function ProfilePage() {
-  const [myPets, setMyPets] = useState<Pet[]>([])
+  const { myPets, loading, error } = useMyPetsData();
   const [myFavoritePets, setMyFavoritePets] = useState<Pet[]>([])
-  const [myListings, setMyListings] = useState<Pet[]>([])
-  const [selectedTab, setSelectedTab] = useState("listings")
+  const [myPostList, setMyPostList] = useState<Post[]>([])
+  const [selectedTab, setSelectedTab] = useState("myPostList")
 
   const handleLikeChangeOnProfile = (petId: string, isLiked: boolean) => {
     setMyFavoritePets((prevFavorites) =>
@@ -61,19 +63,15 @@ export default function ProfilePage() {
 
   useEffect(() => {
     switch (selectedTab) {
-      case "listings":
+      case "myPostList":
         const fetchPostListings = async () => {
-          const response = await api.get('/pets/listings')
-          setMyListings(response.data)
+          const response = await api.get(`/posts/user/a5852080-a6a7-4e32-9bc6-f976c395a2a0`)
+          setMyPostList(response.data)
         }
         fetchPostListings()
         break
-      case "petlist":
-        const fetchMyPets = async () => {
-          const response = await api.get('/pets/personal')
-          setMyPets(response.data)
-        }
-        fetchMyPets()
+      case "mypets":
+        // My Pets data is already fetched by useMyPetsData hook
         break
       case "favorites":
         const fetchMyFavorites = async () => {
@@ -150,15 +148,15 @@ export default function ProfilePage() {
 
       {/* Tabs */}
       <Tabs
-        defaultValue="listings"
+        defaultValue="myPostList"
         value={selectedTab}
         onValueChange={setSelectedTab}
         className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-6">
-          <TabsTrigger value="listings" className="text-center">
+          <TabsTrigger value="myPostList" className="text-center">
             {t('myListings')}
           </TabsTrigger>
-          <TabsTrigger value="petlist" className="text-center">
+          <TabsTrigger value="mypets" className="text-center">
             {t('myPetList')}
           </TabsTrigger>
           <TabsTrigger value="favorites" className="text-center">
@@ -168,9 +166,15 @@ export default function ProfilePage() {
             {t('messages')}
           </TabsTrigger>
         </TabsList>
-
+        <TabsContent value="myPostList">
+          <div className="space-y-4">
+            {myPostList.map((post) => (
+              <PostCard key={post.id} post={post} isDetail={false} />
+            ))}
+          </div>
+        </TabsContent>
         {/* My Pet Listings Tab */}
-        <TabsContent value="petlist">
+        <TabsContent value="mypets">
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h2 className="text-lg font-semibold">My Pet Listings</h2>

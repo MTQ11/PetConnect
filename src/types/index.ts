@@ -159,16 +159,25 @@ export interface Post {
   user: {
     id: string;
     name: string;
-    avatar?: string;
+    avatarUrl?: string;
     verified: boolean;
   };
   content: string;
   images?: string[];
-  attachedPets: Pet[];
-  likes: number;
+  pets: {
+    id: string;
+    name: string;
+    images?: string[];
+    breed_vi: string;
+    breed_en: string;
+    species_vi: string;
+    species_en: string;
+    price?: number;
+  }[];
+  likeCount: number;
   comments: number;
   shares: number;
-  isLiked: boolean;
+  isLikedByCurrentUser: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -184,5 +193,6 @@ export interface Comment {
     avatar?: string;
   };
   content: string;
+  parentId?: string;
   createdAt: Date;
 }

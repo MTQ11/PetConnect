@@ -15,6 +15,8 @@ import { formatDistanceToNow } from "date-fns"
 import { PetCard } from "@/components/features/PetCard"
 import { useMyPetsData } from "@/lib/hooks/useMyPetsData"
 import { PostCard } from "@/components/features/PostCard"
+import { EditProfileModal } from "@/components/features/EditProfileModal"
+import { useAppSelector } from "@/store/hook"
 
 // Mock data
 const messages = [
@@ -48,10 +50,12 @@ const messages = [
 ]
 
 export default function ProfilePage() {
+  const { user } = useAppSelector((state) => state.auth)
   const { myPets, loading, error } = useMyPetsData();
   const [myFavoritePets, setMyFavoritePets] = useState<Pet[]>([])
   const [myPostList, setMyPostList] = useState<Post[]>([])
   const [selectedTab, setSelectedTab] = useState("myPostList")
+  const [showEditModal, setShowEditModal] = useState(false)
 
   const handleLikeChangeOnProfile = (petId: string, isLiked: boolean) => {
     setMyFavoritePets((prevFavorites) =>
@@ -62,10 +66,12 @@ export default function ProfilePage() {
   }
 
   useEffect(() => {
+    if (!user) return
+    
     switch (selectedTab) {
       case "myPostList":
         const fetchPostListings = async () => {
-          const response = await api.get(`/posts/user/a5852080-a6a7-4e32-9bc6-f976c395a2a0`)
+          const response = await api.get(`/posts/user/${user.id}`)
           setMyPostList(response.data)
         }
         fetchPostListings()
@@ -83,7 +89,23 @@ export default function ProfilePage() {
       default:
         break
     }
-  }, [selectedTab])
+  }, [selectedTab, user])
+
+  if (!user) {
+    return (
+      <Layout maxWidth="xl">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Vui lòng đăng nhập</h2>
+            <p className="text-gray-600 mb-4">Bạn cần đăng nhập để xem trang profile</p>
+            <Link href="/login">
+              <Button>Đăng nhập</Button>
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    )
+  }
 
   return (
     <Layout maxWidth="xl">
@@ -92,43 +114,45 @@ export default function ProfilePage() {
         <div className="flex flex-col lg:flex-row justify-between gap-6">
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="relative flex-shrink-0">
-              <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center">
-                <span className="text-2xl">SJ</span>
-              </div>
-              <Badge className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs px-2">
-                {t('verifiedUser')}
-              </Badge>
+              <img
+                src={user.avatar || "/api/placeholder/80/80"}
+                alt={user.name}
+                className="w-20 h-20 rounded-full object-cover"
+              />
+              {user.verified && (
+                <Badge className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs px-2">
+                  {t('verifiedUser')}
+                </Badge>
+              )}
             </div>
             <div className="flex flex-col gap-2 flex-1">
-              <h1 className="text-xl font-semibold">Sarah Johnson</h1>
+              <h1 className="text-xl font-semibold">{user.name}</h1>
               <div className="text-gray-600 text-sm space-y-1">
-                <p>📧 sarah.johnson@gmail.com</p>
-                <p>📞 (555) 123-4567</p>
-                <p>📍 New York, NY</p>
-                <p>📅 {t('memberSince')} March 2019</p>
+                <p>📧 {user.email}</p>
+                {user.phone && <p>📞 {user.phone}</p>}
+                {user.address && <p>📍 {user.address}</p>}
+                <p>📅 {t('memberSince')} {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</p>
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span><strong>4.8</strong> (23 {t('reviews')})</span>
+                  <span><strong>{user.rating || 0}</strong> (Chưa có đánh giá)</span>
                 </div>
               </div>
-              <p className="text-gray-700 text-sm max-w-md mt-2">
-                Passionate pet lover and responsible breeder. I've been helping pets find loving homes for over 5 years. All my pets are well-cared for and come with complete health records.
-              </p>
+              <div>{user.description}</div>
             </div>
           </div>
 
           <div className="flex flex-col lg:items-end gap-4">
             <div className="flex justify-center lg:justify-end gap-8 text-center">
               <div>
-                <p className="text-2xl font-bold">8</p>
-                <p className="text-sm text-gray-600">{t('totalPets')}</p>
+                <p className="text-2xl font-bold">{user.postCount || myPostList.length}</p>
+                <p className="text-sm text-gray-600">Bài đăng</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-green-600">3</p>
+                <p className="text-2xl font-bold text-green-600">{user.petCount || myPets.length}</p>
                 <p className="text-sm text-gray-600">{t('activePets')}</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-500">5</p>
+                <p className="text-2xl font-bold text-gray-500">{user.totalPetsSold || 0}</p>
                 <p className="text-sm text-gray-600">{t('soldPets')}</p>
               </div>
             </div>
@@ -138,7 +162,11 @@ export default function ProfilePage() {
                   + {t('postNewPet')}
                 </Button>
               </Link>
-              <Button variant="outline" className="w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                className="w-full sm:w-auto"
+                onClick={() => setShowEditModal(true)}
+              >
                 ✏️ {t('editProfile')}
               </Button>
             </div>
@@ -282,6 +310,13 @@ export default function ProfilePage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        user={user}
+      />
     </Layout>
   )
 }

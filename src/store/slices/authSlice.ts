@@ -60,6 +60,22 @@ export const checkAuthStatus = createAsyncThunk(
     }
 )
 
+export const updateUserInfo = createAsyncThunk(
+    'auth/updateUser',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.get('/users/me');
+
+            if (!(response.status >= 200 && response.status < 300)) {
+                return rejectWithValue({ error: response.data?.message || 'Failed to fetch updated user data' });
+            }
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue({ error: error?.message || 'Failed to fetch updated user data' });
+        }
+    }
+)
+
 interface AuthState {
     user: User | null
     isAuthenticated: boolean
@@ -123,7 +139,6 @@ const authSlice = createSlice({
             })
             .addCase(checkAuthStatus.fulfilled, (state: AuthState, action: PayloadAction<any>) => {
                 state.user = action.payload.user;
-                state.token = action.payload.access_token;
                 state.isAuthenticated = true;
                 state.isLoading = false;
                 state.error = null;
@@ -132,6 +147,20 @@ const authSlice = createSlice({
                 state.isAuthenticated = false;
                 state.isLoading = false;
                 state.error = action.payload?.error || action.error?.message || 'Failed to fetch user data';
+            })
+
+            // updateUserInfo
+            .addCase(updateUserInfo.pending, (state: AuthState) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(updateUserInfo.fulfilled, (state: AuthState, action: PayloadAction<any>) => {
+                state.isLoading = false;
+                state.user = action.payload;
+            })
+            .addCase(updateUserInfo.rejected, (state: AuthState, action: any) => {
+                state.isLoading = false;
+                state.error = action.payload?.error || action.error?.message || 'Failed to update user data';
             });
     }
 })

@@ -38,6 +38,7 @@ export const ROUTES = {
   pets: "/pets",
   marketplace: "/marketplace",
   profile: "/profile",
+  userProfile: (id: string) => `/profile/${id}`,
   createpet: "/createpet",
   auth: {
     login: "/auth/login",

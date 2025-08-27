@@ -76,8 +76,13 @@ export interface User {
   verified: boolean;
   pets: Pet[];
   rating: number;
+  description: string;
   createdAt: Date;
   updatedAt: Date;
+
+  postCount?: number;
+  petCount?: number;
+  totalPetsSold?: number;
 }
 
 // Interface cho Marketplace Listing

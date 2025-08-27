@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Comment, Post } from "@/types"
 import api from "@/lib/api/axios"
 import { t } from "@/lib/i18n"
+import { useRouter } from "next/navigation"
+import { ROUTES } from "@/lib/constants"
 
 interface DetailPostModalProps {
     open: boolean;
@@ -16,6 +18,7 @@ interface DetailPostModalProps {
 }
 
 export function DetailPostModal({ open, onOpenChange, post }: DetailPostModalProps) {
+    const router = useRouter()
     const [comment, setComment] = useState<Comment>({
         id: "",
         postId: post.id,
@@ -30,6 +33,11 @@ export function DetailPostModal({ open, onOpenChange, post }: DetailPostModalPro
     })
     
     const [commentList, setCommentList] = useState<Comment[]>([])
+
+    const handleUserClick = (userId: string) => {
+        router.push(ROUTES.userProfile(userId))
+        onOpenChange(false) // Close modal when navigating
+    }
 
     const submitComment = async () => {
         try {
@@ -72,9 +80,19 @@ export function DetailPostModal({ open, onOpenChange, post }: DetailPostModalPro
                         <div className="space-y-4 max-h-64 overflow-y-auto">
                             {commentList.map(c => (
                                 <div key={c.id} className="flex items-start gap-3">
-                                    <img src={c.user?.avatar} alt={c.user?.name} className="w-8 h-8 rounded-full object-cover" />
+                                    <img 
+                                        src={c.user?.avatar || "/api/placeholder/32/32"} 
+                                        alt={c.user?.name} 
+                                        className="w-8 h-8 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all" 
+                                        onClick={() => handleUserClick(c.user.id)}
+                                    />
                                     <div>
-                                        <div className="font-medium text-gray-900 text-sm">{c.user?.name}</div>
+                                        <div 
+                                            className="font-medium text-gray-900 text-sm cursor-pointer hover:text-blue-600 transition-colors"
+                                            onClick={() => handleUserClick(c.user.id)}
+                                        >
+                                            {c.user?.name}
+                                        </div>
                                         <div className="text-xs text-gray-500 mb-1">{new Date(c.createdAt).toLocaleString()}</div>
                                         <div className="text-sm text-gray-800">{c.content}</div>
                                     </div>

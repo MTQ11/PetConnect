@@ -46,7 +46,7 @@ function MarketplaceLink() {
 }
 
 export function Header() {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -97,9 +97,17 @@ export function Header() {
                 </>
               ) : (
                 <Link href={ROUTES.profile}>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-1">
-                    <User className="w-4 h-4" />
-                    <span className="hidden md:inline">{t('profile')}</span>
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="w-6 h-6 rounded-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-4 h-4" />
+                    )}
+                    <span className="hidden md:inline">{user?.name || t('profile')}</span>
                   </Button>
                 </Link>
               )

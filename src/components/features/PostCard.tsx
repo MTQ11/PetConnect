@@ -21,6 +21,8 @@ import { Post } from "@/types"
 import { DetailPostModal } from "./DetailPostModal"
 import { t } from "@/lib/i18n"
 import api from "@/lib/api/axios"
+import { useRouter } from "next/navigation"
+import { ROUTES } from "@/lib/constants"
 
 interface PostCardProps {
   post: Post,
@@ -28,6 +30,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, isDetail = false }: PostCardProps) {
+  const router = useRouter()
   const [isLiked, setIsLiked] = useState(post.isLikedByCurrentUser)
   const [likeCount, setLikeCount] = useState(post.likeCount)
   const [showFullContent, setShowFullContent] = useState(false)
@@ -46,6 +49,10 @@ export function PostCard({ post, isDetail = false }: PostCardProps) {
 
     const payload = { postId: post.id }
     await api.post('likes/toggle', payload)
+  }
+
+  const handleUserClick = () => {
+    router.push(ROUTES.userProfile(post.user.id))
   }
 
   const formatTimeAgo = (date: Date) => {
@@ -79,11 +86,17 @@ export function PostCard({ post, isDetail = false }: PostCardProps) {
               <img
                 src={post.user.avatarUrl || "/api/placeholder/40/40"}
                 alt={post.user.name}
-                className="w-8 h-8 rounded-full object-cover"
+                className="w-8 h-8 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+                onClick={handleUserClick}
               />
               <div>
                 <div className="flex items-center gap-1">
-                  <h3 className="font-medium text-gray-900 text-sm">{post.user.name}</h3>
+                  <h3 
+                    className="font-medium text-gray-900 text-sm cursor-pointer hover:text-blue-600 transition-colors"
+                    onClick={handleUserClick}
+                  >
+                    {post.user.name}
+                  </h3>
                   {post.user.verified && (
                     <Verified className="w-3 h-3 text-blue-500" />
                   )}

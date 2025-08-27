@@ -11,12 +11,14 @@ import { t } from "@/lib/i18n"
 import { Pet } from "@/types"
 import api from "@/lib/api/axios"
 import { imageUploadToCloudinary } from "@/lib/utils/fetchCloudinary"
+import { useAppSelector } from "@/store/hook"
 
 interface CreatePostProps {
   myPets: Pet[];
 }
 
 export function CreatePost({ myPets }: CreatePostProps) {
+  const { user } = useAppSelector(state => state.auth)
   const [content, setContent] = useState("")
   const [openAttachPets, setOpenAttachPets] = useState(false)
   const [selectedPets, setSelectedPets] = useState<Pet[]>([])
@@ -73,7 +75,7 @@ export function CreatePost({ myPets }: CreatePostProps) {
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <img
-            src="/api/placeholder/40/40"
+            src={user?.avatar}
             alt="Your avatar"
             className="w-8 h-8 rounded-full object-cover"
           />

@@ -8,6 +8,8 @@ import { t } from "@/lib/i18n"
 import api from "@/lib/api/axios"
 import { useAppDispatch } from "@/store/hook"
 import { updatePetLike } from "@/store/slices/marketplaceSlice"
+import { useRouter } from "next/navigation"
+import { ROUTES } from "@/lib/constants"
 
 interface PetCardProps {
     pet: Pet
@@ -16,8 +18,16 @@ interface PetCardProps {
 
 export function PetCard({ pet, onLikeChange }: PetCardProps) {
     const dispatch = useAppDispatch()
+    const router = useRouter()
+    
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('vi-VN').format(price)
+    }
+
+    const handleOwnerClick = (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        router.push(ROUTES.userProfile(pet.owner.id))
     }
 
     const likePet = async (petId: string, isLiked: boolean) => {
@@ -99,10 +109,27 @@ export function PetCard({ pet, onLikeChange }: PetCardProps) {
                         <p className="text-xs text-gray-600 mb-1">{pet.breed.name_vi} / {pet.age} {pet.ageUnit}</p>
                         <p className="text-xs text-gray-500 line-clamp-2">{pet.description}</p>
                     </div>
+                    
+                    {/* Owner Info */}
+                    <div className="flex items-center gap-2 mb-2">
+                        <img
+                            src={pet.owner.avatar || "/api/placeholder/24/24"}
+                            alt={pet.owner.name}
+                            className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+                            onClick={handleOwnerClick}
+                        />
+                        <span 
+                            className="text-xs text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+                            onClick={handleOwnerClick}
+                        >
+                            {pet.owner.name}
+                        </span>
+                    </div>
+                    
                     {/* Location */}
                     <div className="flex items-center text-xs text-gray-500 mb-2">
                         <MapPin className="w-3 h-3 mr-1" />
-                        <span>{pet.owner.address}</span>
+                        <span>{pet.owner.address || "Chưa cập nhật"}</span>
                     </div>
                     {/* Price */}
                     <div className="flex items-center justify-between">

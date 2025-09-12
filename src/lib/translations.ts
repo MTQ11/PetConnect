@@ -85,6 +85,7 @@ export const vi = {
   userLocation: "Địa điểm",
   verifiedUser: "Đã xác thực",
   addNewPet: "Thêm thú cưng mới",
+  viewUserSite: "Website của tôi",
   
   // Pet listing stats - Thống kê tin đăng
   views: "lượt xem",

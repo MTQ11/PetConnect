@@ -40,6 +40,7 @@ export const ROUTES = {
   profile: "/profile",
   userProfile: (id: string) => `/profile/${id}`,
   createpet: "/createpet",
+  userSite: (id: string) => `${id}`,
   auth: {
     login: "/auth/login",
     register: "/auth/register"

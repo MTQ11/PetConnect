@@ -1,5 +1,6 @@
 "use client"
 
+import { MyPetCard } from '@/components/features/MyPetCard'
 import Link from "next/link"
 import { Layout } from "@/components/layout/Layout"
 import { Button } from "@/components/ui/Button"
@@ -63,6 +64,32 @@ export default function ProfilePage() {
         pet.id === petId ? { ...pet, isLiked } : pet
       )
     )
+  }
+
+  const handleEditPet = (petId: string) => {
+    // Navigate to edit pet page
+    console.log('Edit pet:', petId)
+  }
+
+  const handleDeletePet = (petId: string) => {
+    // Show confirmation dialog and delete pet
+    if (window.confirm('Are you sure you want to delete this pet?')) {
+      console.log('Delete pet:', petId)
+      // Implement delete logic here
+      // You can call API to delete pet
+    }
+  }
+
+  const handleTogglePetStatus = (petId: string) => {
+    // Toggle pet availability status
+    console.log('Toggle pet status:', petId)
+    // Implement toggle status logic here
+    // You can call API to update pet status
+  }
+
+  const handleViewPetDetails = (petId: string) => {
+    // Navigate to pet details page
+    console.log('View pet details:', petId)
   }
 
   useEffect(() => {
@@ -169,6 +196,11 @@ export default function ProfilePage() {
               >
                 ✏️ {t('editProfile')}
               </Button>
+              <Link href={ROUTES.userSite(user.id)}>
+                <Button variant="outline" className="w-full sm:w-auto">
+                  🌐 {t('viewUserSite')}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -213,50 +245,14 @@ export default function ProfilePage() {
 
             <div className="space-y-3">
               {myPets.map((pet) => (
-                <div key={pet.id} className="bg-white p-4 rounded-lg shadow-sm border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 flex-1">
-                    <img
-                      src={pet.images[0] || "/api/placeholder/80/80"}
-                      alt={pet.name}
-                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold">{pet.name}</h3>
-                      <p className="text-sm text-gray-600">{pet.breed.name_vi} • {pet.age} {pet.ageUnit == AgeUnit.YEAR ? t('years') : pet.ageUnit == AgeUnit.MONTH ? t('months') : t('weeks')}</p>
-                      <p className="text-lg font-bold">${pet.price.toLocaleString()}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full sm:w-auto">
-                    <div className="text-sm text-gray-500">
-                      <span>{t('postedAgo')} {formatDistanceToNow(new Date(pet.createdAt), { addSuffix: true })}</span>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        <span>{pet.view} {t('views')}</span>
-                      </div>
-                      {/* <div className="flex items-center gap-1">
-                        <Heart className="w-4 h-4" />
-                        <span>{pet.favorites} {t('favorites_count')}</span>
-                      </div> */}
-                      {/* <div className="flex items-center gap-1">
-                        <MessageCircle className="w-4 h-4" />
-                        <span>{pet.messages} {t('messages_count')}</span>
-                      </div> */}
-                    </div>
-                    {/* <div className="flex items-center gap-2">
-                      <Badge
-                        className={pet.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
-                      >
-                        {pet.status === 'active' ? t('active') : t('sold')}
-                      </Badge>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </div> */}
-                  </div>
-                </div>
+                <MyPetCard
+                  key={pet.id}
+                  pet={pet}
+                  onEdit={handleEditPet}
+                  onDelete={handleDeletePet}
+                  onToggleStatus={handleTogglePetStatus}
+                  onViewDetails={handleViewPetDetails}
+                />
               ))}
             </div>
           </div>

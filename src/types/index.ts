@@ -201,3 +201,58 @@ export interface Comment {
   parentId?: string;
   createdAt: Date;
 }
+
+// Interface cho userSite
+export interface UserSite {
+  id: string;
+  subDomain: string;
+  userId: string;
+  user: User;
+  layoutConfig: LayoutConfig
+}
+
+export enum SectionType {
+  HEADER = 'header',
+  HERO = 'hero',
+  PET_LIST = 'pet_list',
+  REVIEW = 'review',
+  ABOUT = 'about',
+  FOOTER = 'footer',
+}
+
+export interface BaseSection {
+  type: SectionType;
+  title?: string;
+  subtitle?: string;
+}
+
+export interface HeaderSection extends BaseSection {
+  logoUrl?: string;
+  logo?: File;
+  businessName?: string;
+}
+
+export interface HeroSection extends BaseSection {
+  imageUrls?: string[];
+  images?: File[];
+}
+
+export interface PetListSection extends BaseSection {
+  pets?: Pet[];
+}
+
+export interface AboutSection extends BaseSection {
+  content?: string;
+}
+
+export interface FooterSection extends BaseSection {
+  phone?: string;
+  email?: string;
+  address?: string;
+}
+
+export type Section = HeaderSection | HeroSection | PetListSection | AboutSection | FooterSection;
+
+export interface LayoutConfig {
+  sections: Section[];
+}

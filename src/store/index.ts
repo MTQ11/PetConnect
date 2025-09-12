@@ -4,6 +4,7 @@ import speciesSlice from './slices/speciesSlice'
 import marketplaceSlice from './slices/marketplaceSlice'
 import newFeedSlice from './slices/newfeedSlice'
 import myPetsSlice from './slices/myPetsSlice'
+import userSiteSlice from './slices/userSiteSlice'
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     species: speciesSlice,
     marketplace: marketplaceSlice,
     newfeed: newFeedSlice,
-    myPets: myPetsSlice
+    myPets: myPetsSlice,
+    userSite: userSiteSlice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

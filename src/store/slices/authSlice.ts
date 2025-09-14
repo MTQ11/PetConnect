@@ -27,8 +27,20 @@ export const loginUser = createAsyncThunk(
 
 export const loginZaloUser = createAsyncThunk(
     'auth/loginZalo',
-    async () => {
-        
+    async (credentials: { verifierCode: string, authorizationCode: string }, { rejectWithValue }) => {
+        const response = await api.post('/auth/zalo', credentials);
+
+            if (!(response.status >= 200 && response.status < 300)) {
+                return rejectWithValue({ error: response.data?.message || 'Đăng nhập thất bại' });
+            }
+
+            const storage = localStorage;
+            storage.setItem('accessToken', response.data.access_token);
+            if (response.data.refresh_token) {
+                storage.setItem('refreshToken', response.data.refresh_token);
+            }
+
+            return response.data;
     }
 )
 
@@ -50,6 +62,21 @@ export const loginGoogleUser = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue({ error: error?.message || 'Đăng nhập thất bại' });
+        }
+    }
+)
+
+export const registerUser = createAsyncThunk(
+    'auth/register',
+    async (userData: { name: string, email: string, phone: string, password: string }, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/auth/register', userData);
+            if (!(response.status >= 200 && response.status < 300)) {
+                return rejectWithValue({ error: response.data?.message || 'Đăng ký thất bại' });
+            }
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue({ error: error?.message || 'Đăng ký thất bại' });
         }
     }
 )
@@ -160,6 +187,38 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.isAuthenticated = false;
                 state.error = action.payload?.error || action.error?.message || 'Đăng nhập thất bại';
+            })
+
+            //loginZalo
+            .addCase(loginZaloUser.pending, (state: AuthState) => {
+                state.isLoading = true;
+            })
+            .addCase(loginZaloUser.fulfilled, (state: AuthState, action: PayloadAction<any>) => {
+                state.isLoading = false;
+                state.isAuthenticated = true;
+                state.user = action.payload.user;
+                state.token = action.payload.access_token;
+            })
+            .addCase(loginZaloUser.rejected, (state: AuthState, action: any) => {
+                state.isLoading = false;
+                state.isAuthenticated = false;
+                state.error = action.payload?.error || action.error?.message || 'Đăng nhập thất bại';
+            })
+
+            //register
+            .addCase(registerUser.pending, (state: AuthState) => {
+                state.isLoading = true;
+            })
+            .addCase(registerUser.fulfilled, (state: AuthState, action: PayloadAction<any>) => {
+                state.isLoading = false;
+                state.isAuthenticated = true;
+                state.user = action.payload.user;
+                state.token = action.payload.access_token;
+            })
+            .addCase(registerUser.rejected, (state: AuthState, action: any) => {
+                state.isLoading = false;
+                state.isAuthenticated = false;
+                state.error = action.payload?.error || action.error?.message || 'Đăng ký thất bại';
             })
 
             //logout

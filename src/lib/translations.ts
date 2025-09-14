@@ -296,6 +296,7 @@ export const vi = {
   fullNamePlaceholder: "Nhập họ và tên",
   phonePlaceholder: "Nhập số điện thoại",
   invalidEmail: "Email không hợp lệ",
+  invalidPhone: "Số điện thoại không hợp lệ",
   passwordTooShort: "Mật khẩu phải có ít nhất 6 ký tự",
   passwordNotMatch: "Mật khẩu không khớp",
   fieldRequired: "Trường này bắt buộc",

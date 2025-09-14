@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Layout } from "@/components/layout/Layout"
@@ -10,9 +10,16 @@ import { Label } from "@/components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock, User, Phone, Heart } from "lucide-react"
 import { t } from "@/lib/i18n"
+import { GoogleLogin } from "@react-oauth/google"
+import { useSocialLogin } from "@/lib/hooks/useSocialLogin"
+import { useAppDispatch, useAppSelector } from "@/store/hook"
+import { registerUser } from "@/store/slices/authSlice"
 
 export default function RegisterPage() {
+  const dispatch = useAppDispatch()
   const router = useRouter()
+  const { isLoading, error, isAuthenticated } = useAppSelector(state => state.auth)
+  const { handleGoogleLogin, handleZaloLogin } = useSocialLogin()
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -24,7 +31,6 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  const [isLoading, setIsLoading] = useState(false)
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
@@ -41,6 +47,11 @@ export default function RegisterPage() {
 
     if (!formData.phone.trim()) {
       newErrors.phone = t('fieldRequired')
+    } else {
+      const isPhone = /^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ''))
+      if (!isPhone) {
+        newErrors.phone = t('invalidPhone')
+      }
     }
 
     if (!formData.password) {
@@ -68,28 +79,19 @@ export default function RegisterPage() {
 
     if (!validateForm()) return
 
-    setIsLoading(true)
+    dispatch(registerUser({
+      name: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password
+    }))
+  }
 
-    // Simulate API call
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      alert(t('registerSuccess'))
-      router.push('/login')
-    } catch (error) {
-      alert(t('registerFailed'))
-    } finally {
-      setIsLoading(false)
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/")
     }
-  }
-
-  const handleZaloRegister = () => {
-    setIsLoading(true)
-    // Simulate Zalo register
-    setTimeout(() => {
-      alert("Đăng ký với Zalo thành công!")
-      router.push('/')
-    }, 2000)
-  }
+  }, [isAuthenticated, router])
 
   return (
     <Layout maxWidth="sm">
@@ -107,34 +109,28 @@ export default function RegisterPage() {
             </p>
           </CardHeader>
 
-          <CardContent className="space-y-6">
-            {/* Zalo Register Button */}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full h-12 border-blue-500 text-blue-600 hover:bg-blue-50"
-              onClick={handleZaloRegister}
-              disabled={isLoading}
-            >
-              <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3">
-                <img src="/zalo_icon.png" alt="Zalo Icon" />
-              </div>
-              {t('quickRegisterWithZalo')}
-            </Button>
+          <CardContent className="space-y-4">
+            {/* Google Login Button */}
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => { console.log("Google Login Failed"); }}
+              theme="filled_blue" // filled_blue | outline | filled_black
+              size="large"        // small | medium | large
+              shape="rectangular" // rectangular | pill | circle | square
+              text="signin_with"  // signin_with | signup_with | continue_with | signin
+            />
 
-            {/* Goolge Register Button */}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full h-12 border-red-600 text-red-600 hover:bg-red-50"
-              // onClick={handleZaloRegister}
+            {/* Zalo Login Button */}
+            <button
+              className="relative w-full h-10 bg-[#1a73e8] text-white rounded-[3px] hover:bg-[#5194ee]"
+              onClick={handleZaloLogin}
               disabled={isLoading}
             >
-              <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3">
-                <img src="/google_icon.png" alt="Google Icon" />
+              <div className="absolute left-0 top-0 w-10 h-10 rounded-l-[3px] border-2 border-[#1a73e8] flex items-center justify-center mr-3 bg-white">
+                <img className="w-6 h-6" src="/zalo_icon.png" alt="Zalo Icon" />
               </div>
-              {t('quickRegisterWithGoogle')}
-            </Button>
+              <p className="pl-4">{t('loginWithZalo')}</p>
+            </button>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -197,7 +193,10 @@ export default function RegisterPage() {
                     type="tel"
                     placeholder={t('phonePlaceholder')}
                     value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                    onChange={(e) => {
+                      const onlyNums = e.target.value.replace(/\D/g, '').slice(0, 10)
+                      setFormData(prev => ({ ...prev, phone: onlyNums }))
+                    }}
                     className={`pl-10 ${errors.phone ? 'border-red-500' : ''}`}
                   />
                 </div>

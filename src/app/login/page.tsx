@@ -11,13 +11,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock, Heart } from "lucide-react"
 import { t } from "@/lib/i18n"
 import { useAppDispatch, useAppSelector } from "@/store/hook"
-import { loginUser, loginGoogleUser, loginZaloUser } from "@/store/slices/authSlice"
-import { GoogleLogin } from "@react-oauth/google";
+import { loginUser, loginZaloUser } from "@/store/slices/authSlice"
+import { GoogleLogin } from "@react-oauth/google"
+import { useSocialLogin } from "@/lib/hooks/useSocialLogin";
 
 export default function LoginPage() {
     const dispatch = useAppDispatch()
     const { isLoading, error, isAuthenticated } = useAppSelector(state => state.auth)
     const router = useRouter()
+    const { handleGoogleLogin, handleZaloLogin } = useSocialLogin()
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({})
     const [showPassword, setShowPassword] = useState(false)
@@ -26,6 +28,15 @@ export default function LoginPage() {
         password: '',
         rememberMe: false
     })
+
+    const [zaloAuthorizationCode, setZaloAuthorizationCode] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const code = new URLSearchParams(window.location.search).get('code');
+            setZaloAuthorizationCode(code);
+        }
+    }, []);
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {}
@@ -62,20 +73,19 @@ export default function LoginPage() {
         }))
     }
 
-    const handleZaloLogin = () => {
-        dispatch(loginZaloUser())
-    }
-
-    const handleGoogleLogin = async (credentialResponse: any) => {
-        const idToken = credentialResponse.credential;
-        dispatch(loginGoogleUser({ idToken }))
-    }
-
     useEffect(() => {
         if (isAuthenticated) {
             router.push("/")
         }
     }, [isAuthenticated, router])
+
+    useEffect(() => {
+        const zaloVerifierCode = localStorage.getItem('zalo_code_verifier');
+
+        if (zaloVerifierCode && zaloAuthorizationCode) {
+            dispatch(loginZaloUser({ verifierCode: zaloVerifierCode, authorizationCode: zaloAuthorizationCode }));
+        }
+    }, [zaloAuthorizationCode])
 
     return (
         <Layout maxWidth="sm">
@@ -93,33 +103,8 @@ export default function LoginPage() {
                         </p>
                     </CardHeader>
 
-                    <CardContent className="space-y-6">
-                        {/* Zalo Login Button */}
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full h-12 border-blue-600 text-blue-600 hover:bg-blue-50"
-                            onClick={handleZaloLogin}
-                            disabled={isLoading}
-                        >
-                            {t('loginWithZalo')}
-                            <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3">
-                                <img src="/zalo_icon.png" alt="Zalo Icon" />
-                            </div>
-                        </Button>
-
-                        {/* Google login button */}
-                        {/* <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full h-12 border-red-600 text-red-600 hover:bg-red-50"
-                            disabled={isLoading}
-                        >
-                            {t('loginWithGoogle')}
-                            <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3">
-                                <img src="/google_icon.png" alt="Google Icon" />
-                            </div>
-                        </Button> */}
+                    <CardContent className="space-y-4">
+                        {/* Google Login Button */}
                         <GoogleLogin
                             onSuccess={handleGoogleLogin}
                             onError={() => { console.log("Google Login Failed"); }}
@@ -128,6 +113,18 @@ export default function LoginPage() {
                             shape="rectangular" // rectangular | pill | circle | square
                             text="signin_with"  // signin_with | signup_with | continue_with | signin
                         />
+
+                        {/* Zalo Login Button */}
+                        <button
+                            className="relative w-full h-10 bg-[#1a73e8] text-white rounded-[3px] hover:bg-[#5194ee]"
+                            onClick={handleZaloLogin}
+                            disabled={isLoading}
+                        >
+                            <div className="absolute left-0 top-0 w-10 h-10 rounded-l-[3px] border-2 border-[#1a73e8] flex items-center justify-center mr-3 bg-white">
+                                <img className="w-6 h-6" src="/zalo_icon.png" alt="Zalo Icon" />
+                            </div>
+                            <p className="pl-4">{t('loginWithZalo')}</p>
+                        </button>
 
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">

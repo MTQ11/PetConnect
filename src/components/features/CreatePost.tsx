@@ -12,6 +12,7 @@ import { Pet } from "@/types"
 import api from "@/lib/api/axios"
 import { imageUploadToCloudinary } from "@/lib/utils/fetchCloudinary"
 import { useAppSelector } from "@/store/hook"
+import { ROUTES } from "@/lib/constants"
 
 interface CreatePostProps {
   myPets: Pet[];
@@ -74,11 +75,13 @@ export function CreatePost({ myPets }: CreatePostProps) {
     <Card className="mb-4">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
-          <img
-            src={user?.avatar}
-            alt="Your avatar"
-            className="w-8 h-8 rounded-full object-cover"
-          />
+          <Link href={ROUTES.profile}>
+            <img
+              src={user?.avatar}
+              alt="Your avatar"
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          </Link>
 
           <div className="flex-1">
             <Textarea

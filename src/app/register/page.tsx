@@ -23,11 +23,11 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
-  const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isLoading, setIsLoading] = useState(false)
 
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {}
+    const newErrors: { [key: string]: string } = {}
 
     if (!formData.fullName.trim()) {
       newErrors.fullName = t('fieldRequired')
@@ -65,11 +65,11 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
 
     setIsLoading(true)
-    
+
     // Simulate API call
     try {
       await new Promise(resolve => setTimeout(resolve, 2000))
@@ -116,10 +116,24 @@ export default function RegisterPage() {
               onClick={handleZaloRegister}
               disabled={isLoading}
             >
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                <span className="text-white text-xs font-bold">Z</span>
+              <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                <img src="/zalo_icon.png" alt="Zalo Icon" />
               </div>
               {t('quickRegisterWithZalo')}
+            </Button>
+
+            {/* Goolge Register Button */}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-12 border-red-600 text-red-600 hover:bg-red-50"
+              // onClick={handleZaloRegister}
+              disabled={isLoading}
+            >
+              <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                <img src="/google_icon.png" alt="Google Icon" />
+              </div>
+              {t('quickRegisterWithGoogle')}
             </Button>
 
             <div className="relative">
@@ -283,7 +297,7 @@ export default function RegisterPage() {
             {/* Login Link */}
             <div className="text-center pt-4">
               <span className="text-gray-600">{t('alreadyHaveAccount')} </span>
-              <Link 
+              <Link
                 href="/login"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >

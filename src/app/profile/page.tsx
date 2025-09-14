@@ -196,11 +196,6 @@ export default function ProfilePage() {
               >
                 ✏️ {t('editProfile')}
               </Button>
-              <Link href={ROUTES.userSite(user.id)}>
-                <Button variant="outline" className="w-full sm:w-auto">
-                  🌐 {t('viewUserSite')}
-                </Button>
-              </Link>
             </div>
           </div>
         </div>

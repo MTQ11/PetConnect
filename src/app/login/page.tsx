@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock, Heart } from "lucide-react"
 import { t } from "@/lib/i18n"
 import { useAppDispatch, useAppSelector } from "@/store/hook"
-import { loginUser, loginZaloUser } from "@/store/slices/authSlice"
+import { loginUser, loginGoogleUser, loginZaloUser } from "@/store/slices/authSlice"
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
     const dispatch = useAppDispatch()
@@ -65,6 +66,11 @@ export default function LoginPage() {
         dispatch(loginZaloUser())
     }
 
+    const handleGoogleLogin = async (credentialResponse: any) => {
+        const idToken = credentialResponse.credential;
+        dispatch(loginGoogleUser({ idToken }))
+    }
+
     useEffect(() => {
         if (isAuthenticated) {
             router.push("/")
@@ -92,15 +98,36 @@ export default function LoginPage() {
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full h-12 border-blue-500 text-blue-600 hover:bg-blue-50"
+                            className="w-full h-12 border-blue-600 text-blue-600 hover:bg-blue-50"
                             onClick={handleZaloLogin}
                             disabled={isLoading}
                         >
-                            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                                <span className="text-white text-xs font-bold">Z</span>
-                            </div>
                             {t('loginWithZalo')}
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <img src="/zalo_icon.png" alt="Zalo Icon" />
+                            </div>
                         </Button>
+
+                        {/* Google login button */}
+                        {/* <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full h-12 border-red-600 text-red-600 hover:bg-red-50"
+                            disabled={isLoading}
+                        >
+                            {t('loginWithGoogle')}
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <img src="/google_icon.png" alt="Google Icon" />
+                            </div>
+                        </Button> */}
+                        <GoogleLogin
+                            onSuccess={handleGoogleLogin}
+                            onError={() => { console.log("Google Login Failed"); }}
+                            theme="filled_blue" // filled_blue | outline | filled_black
+                            size="large"        // small | medium | large
+                            shape="rectangular" // rectangular | pill | circle | square
+                            text="signin_with"  // signin_with | signup_with | continue_with | signin
+                        />
 
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">

@@ -32,6 +32,28 @@ export const loginZaloUser = createAsyncThunk(
     }
 )
 
+export const loginGoogleUser = createAsyncThunk(
+    'auth/loginGoogle',
+    async (credentials: { idToken: string }, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/auth/google', { idToken: credentials.idToken });
+            if (!(response.status >= 200 && response.status < 300)) {
+                return rejectWithValue({ error: response.data?.message || 'Đăng nhập thất bại' });
+            }
+
+            const storage = localStorage;
+            storage.setItem('accessToken', response.data.access_token);
+            if (response.data.refresh_token) {
+                storage.setItem('refreshToken', response.data.refresh_token);
+            }
+
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue({ error: error?.message || 'Đăng nhập thất bại' });
+        }
+    }
+)
+
 export const logoutUser = createAsyncThunk(
     'auth/logout',
     async () => {
@@ -40,7 +62,7 @@ export const logoutUser = createAsyncThunk(
         sessionStorage.removeItem('accessToken')
         sessionStorage.removeItem('refreshToken')
 
-        await api.post('/auth/logout');
+        // await api.post('/auth/logout');
     }
 )
 
@@ -119,6 +141,22 @@ const authSlice = createSlice({
                 state.token = action.payload.access_token;
             })
             .addCase(loginUser.rejected, (state: AuthState, action: any) => {
+                state.isLoading = false;
+                state.isAuthenticated = false;
+                state.error = action.payload?.error || action.error?.message || 'Đăng nhập thất bại';
+            })
+
+            //loginGoogle
+            .addCase(loginGoogleUser.pending, (state: AuthState) => {
+                state.isLoading = true;
+            })
+            .addCase(loginGoogleUser.fulfilled, (state: AuthState, action: PayloadAction<any>) => {
+                state.isLoading = false;
+                state.isAuthenticated = true;
+                state.user = action.payload.user;
+                state.token = action.payload.access_token;
+            })
+            .addCase(loginGoogleUser.rejected, (state: AuthState, action: any) => {
                 state.isLoading = false;
                 state.isAuthenticated = false;
                 state.error = action.payload?.error || action.error?.message || 'Đăng nhập thất bại';

@@ -282,6 +282,8 @@ export const vi = {
   dontHaveAccount: "Chưa có tài khoản?",
   alreadyHaveAccount: "Đã có tài khoản?",
   loginWithZalo: "Đăng nhập với Zalo",
+  loginWithGoogle: "Đăng nhập với Google",
+  quickRegisterWithGoogle: "Đăng ký nhanh với Google",
   quickRegisterWithZalo: "Đăng ký nhanh với Zalo",
   orContinueWith: "Hoặc tiếp tục với",
   byRegisteringYouAgree: "Bằng việc đăng ký, bạn đồng ý với",

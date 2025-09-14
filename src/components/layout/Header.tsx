@@ -9,7 +9,8 @@ import { ROUTES } from "@/lib/constants"
 import { t } from "@/lib/i18n"
 import { useAppSelector } from "@/store/hook"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
+import { ProfileDropDown } from "@/components/features/ProfileDropdown"
 
 // MarketplaceLink: Nút dẫn tới marketplace với hiệu ứng chuyển đổi giao diện
 function MarketplaceLink() {
@@ -47,6 +48,22 @@ function MarketplaceLink() {
 
 export function Header() {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -96,8 +113,13 @@ export function Header() {
                   </Link>
                 </>
               ) : (
-                <Link href={ROUTES.profile}>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                <div className="relative" ref={dropdownRef}>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center space-x-2"
+                    onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  >
                     {user?.avatar ? (
                       <img
                         src={user.avatar}
@@ -109,7 +131,8 @@ export function Header() {
                     )}
                     <span className="hidden md:inline">{user?.name || t('profile')}</span>
                   </Button>
-                </Link>
+                  {showProfileDropdown && <ProfileDropDown />}
+                </div>
               )
             }
 

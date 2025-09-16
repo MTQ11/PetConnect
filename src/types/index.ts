@@ -65,6 +65,13 @@ export interface Pet {
   updatedAt: Date;
 }
 
+export enum SortBy {
+    PRICE_ASC = 'price_asc',
+    PRICE_DESC = 'price_desc',
+    FEATURED = 'view_desc',
+    CREATED_AT_DESC = 'createdAt_desc'
+}
+
 // Interface cho User
 export interface User {
   id: string;
@@ -76,7 +83,8 @@ export interface User {
   verified: boolean;
   pets: Pet[];
   rating: number;
-  description: string;
+  reviewCount?: number;
+  description?: string;
   createdAt: Date;
   updatedAt: Date;
 

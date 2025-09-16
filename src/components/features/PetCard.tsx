@@ -63,7 +63,7 @@ export function PetCard({ pet, onLikeChange }: PetCardProps) {
         <div className="overflow-hidden rounded-xl hover:shadow-lg transition-shadow duration-200 relative group cursor-pointer">
             {/* Heart Icon */}
             <button
-                className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
+                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white/60 hover:bg-white transition-colors"
                 onClick={(e) => { 
                     e.preventDefault(); 
                     likePet(pet.id, pet.isLiked); 
@@ -75,9 +75,9 @@ export function PetCard({ pet, onLikeChange }: PetCardProps) {
                 />
             </button>
             {/* Status Badges */}
-            <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
+            <div className="absolute top-3 left-3 z-20 flex flex-col gap-1">
                 {pet.isVerified && (
-                    <Badge className="bg-blue-500 text-white text-xs">
+                    <Badge className="bg-blue-500 text-white text-xs px-2 py-1">
                         {t('verified')}
                     </Badge>
                 )}
@@ -88,30 +88,33 @@ export function PetCard({ pet, onLikeChange }: PetCardProps) {
             )} */}
             </div>
             <Link href={`/pets/${pet.id}`} className="block">
-                {/* Pet Image */}
-                <div className="aspect-[4/3] relative overflow-hidden">
+                {/* Pet Image with overlay */}
+                <div className="aspect-square relative overflow-hidden">
                     <img
                         src={pet.images[0] || "/placeholder-pet.jpg"}
                         alt={pet.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     />
-                    {/* Age badge on image */}
-                    <div className="absolute bottom-2 right-2">
-                        <Badge variant="secondary" className="bg-black/30 text-white text-xs">
+                    {/* Dark gradient overlay at bottom */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                    
+                    {/* View badge on image */}
+                    <div className="absolute top-3 left-3 z-10">
+                        <Badge variant="secondary" className="bg-black/40 text-white text-xs px-2 py-1">
                             <Eye className="w-3 h-3 mr-1"></Eye>{pet.view}
                         </Badge>
                     </div>
-                </div>
-                <CardContent className="p-3">
-                    {/* Pet Info */}
-                    <div className="mb-2">
-                        <h3 className="font-semibold text-base mb-1">{pet.name}</h3>
-                        <p className="text-xs text-gray-600 mb-1">{pet.breed.name_vi} / {pet.age} {pet.ageUnit}</p>
-                        <p className="text-xs text-gray-500 line-clamp-2">{pet.description}</p>
-                    </div>
                     
+                    {/* Pet Info on image overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-1 z-10">
+                        <h3 className="font-semibold text-base text-white drop-shadow-sm">{pet.name}</h3>
+                        <p className="text-xs text-white/90 drop-shadow-sm">{pet.breed.name_vi} / {pet.age} {pet.ageUnit}</p>
+                        <p className="text-xs text-white/80 line-clamp-2 drop-shadow-sm">{pet.description}</p>
+                    </div>
+                </div>
+                <CardContent className="p-2">
                     {/* Owner Info */}
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-1">
                         <img
                             src={pet.owner.avatar || "/api/placeholder/24/24"}
                             alt={pet.owner.name}
@@ -119,7 +122,7 @@ export function PetCard({ pet, onLikeChange }: PetCardProps) {
                             onClick={handleOwnerClick}
                         />
                         <span 
-                            className="text-xs text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+                            className="text-sm text-gray-600 cursor-pointer hover:text-blue-600 transition-colors truncate flex-1"
                             onClick={handleOwnerClick}
                         >
                             {pet.owner.name}
@@ -127,18 +130,18 @@ export function PetCard({ pet, onLikeChange }: PetCardProps) {
                     </div>
                     
                     {/* Location */}
-                    <div className="flex items-center text-xs text-gray-500 mb-2">
-                        <MapPin className="w-3 h-3 mr-1" />
-                        <span>{pet.owner.address || "Chưa cập nhật"}</span>
+                    <div className="flex items-center text-[8px] text-gray-500 mb-2">
+                        <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                        <span className="">{pet.owner.address || "Chưa cập nhật"}</span>
                     </div>
                     {/* Price */}
                     <div className="flex items-center justify-between">
                         <div className="text-lg font-bold text-gray-900">
                             {formatPrice(pet.price)}{t('currency')}
                         </div>
-                        <Button size="sm" className="bg-gray-900 hover:bg-gray-800 text-xs px-3 py-1">
+                        {/* <Button size="sm" className="bg-gray-900 hover:bg-gray-800 text-xs px-2 py-1 h-6">
                             {t('viewDetails')}
-                        </Button>
+                        </Button> */}
                     </div>
                 </CardContent>
             </Link>

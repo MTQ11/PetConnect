@@ -13,7 +13,7 @@ export const ProfileDropDown = () => {
 
     const handleLogout = async () => {
         await dispatch(logoutUser())
-        router.push('/login')
+        router.push("/login");
     }
 
     return(

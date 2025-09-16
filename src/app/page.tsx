@@ -16,15 +16,15 @@ import api from "@/lib/api/axios"
 
 export default function HomePage() {
   const dispatch = useAppDispatch()
+  const { isAuthenticated } = useAppSelector(state => state.auth);
   const { posts, status, error: errorPosts } = useAppSelector(state => state.newfeed)
-
   const { myPets, loading, error: errorMyPets } = useMyPetsData();
 
   const [activeTab, setActiveTab] = useState("forYou")
 
   useEffect(() => {
     dispatch(getAllPost())
-  }, [dispatch])
+  }, [isAuthenticated, dispatch])
 
   return (
     <Layout maxWidth="lg">

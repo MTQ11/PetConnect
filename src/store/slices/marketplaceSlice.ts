@@ -4,8 +4,29 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const getPets = createAsyncThunk(
     'marketplace/getPets',
-    async () => {
-        const response = await api.get('/pets');
+    async (filters?: {
+        specieId?: string;
+        breedIds?: string[];
+        startPrice?: number;
+        endPrice?: number;
+        sortBy?: string;
+    }) => {
+        let url = '/pets';
+        const params = new URLSearchParams();
+
+        if (filters?.specieId) params.append('specieId', filters.specieId);
+        if (filters?.breedIds && filters.breedIds.length > 0) {
+            filters.breedIds.forEach(breedId => params.append('breedIds', breedId));
+        }
+        if (filters?.startPrice !== undefined) params.append('startPrice', filters.startPrice.toString());
+        if (filters?.endPrice !== undefined) params.append('endPrice', filters.endPrice.toString());
+        if (filters?.sortBy) params.append('sortBy', filters.sortBy);
+
+        if (params.toString()) {
+            url += `?${params.toString()}`;
+        }
+
+        const response = await api.get(url);
         return response.data;
     }
 )

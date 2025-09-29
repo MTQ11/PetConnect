@@ -172,7 +172,7 @@ export interface Post {
   user: {
     id: string;
     name: string;
-    avatarUrl?: string;
+    avatar?: string;
     verified: boolean;
   };
   content: string;

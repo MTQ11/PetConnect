@@ -6,25 +6,65 @@ import { PostCard } from "@/components/features/PostCard"
 import { CreatePost } from "@/components/features/CreatePost"
 import { Button } from "@/components/ui/Button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TrendingUp, Users, Heart } from "lucide-react"
+import { TrendingUp, Users, Heart, Loader2 } from "lucide-react"
 import { Post, Species, PetGender, HealthStatus } from "@/types"
 import { t } from "@/lib/i18n"
-import { useAppDispatch, useAppSelector } from "@/store/hook"
-import { getAllPost } from "@/store/slices/newfeedSlice"
+import { useAppSelector } from "@/store/hook"
 import { useMyPetsData } from "@/lib/hooks/useMyPetsData"
-import api from "@/lib/api/axios"
+import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll"
+import { PostSkeletonList } from "@/components/ui/PostSkeleton"
 
 export default function HomePage() {
-  const dispatch = useAppDispatch()
   const { isAuthenticated } = useAppSelector(state => state.auth);
-  const { posts, status, error: errorPosts } = useAppSelector(state => state.newfeed)
   const { myPets, loading, error: errorMyPets } = useMyPetsData();
+  const { 
+    posts, 
+    status, 
+    error: errorPosts, 
+    hasMore, 
+    loadingMore, 
+    loadInitialPosts,
+    setLastPostRef
+  } = useInfiniteScroll();
 
   const [activeTab, setActiveTab] = useState("forYou")
 
   useEffect(() => {
-    dispatch(getAllPost())
-  }, [isAuthenticated, dispatch])
+    if (status === 'idle') {
+      loadInitialPosts()
+    }
+  }, [status, loadInitialPosts])
+
+  const renderPostsWithInfiniteScroll = (postsToRender: any[]) => {
+    return (
+      <>
+        {postsToRender.map((post, index) => {
+          const isLastPost = index === postsToRender.length - 1;
+          return (
+            <div
+              key={post.id}
+              ref={isLastPost ? setLastPostRef : null}
+            >
+              <PostCard post={post} isDetail={false} />
+            </div>
+          );
+        })}
+        {/* Loading indicator for infinite scroll */}
+        {loadingMore && (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            <span className="ml-2 text-gray-600">Đang tải thêm bài viết...</span>
+          </div>
+        )}
+        {/* End of posts indicator */}
+        {!hasMore && posts.length > 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <p>Bạn đã xem hết tất cả bài viết</p>
+          </div>
+        )}
+      </>
+    );
+  };
 
   return (
     <Layout maxWidth="lg">
@@ -65,27 +105,50 @@ export default function HomePage() {
 
               {/* Posts Feed */}
               <div className="space-y-4">
-                {posts.map((post) => (
-                  <PostCard key={post.id} post={post} isDetail={false} />
-                ))}
+                {status === 'loading' && posts.length === 0 ? (
+                  <PostSkeletonList count={5} />
+                ) : status === 'failed' ? (
+                  <div className="text-center py-8">
+                    <p className="text-red-500 mb-4">Có lỗi xảy ra khi tải bài đăng</p>
+                    <Button onClick={loadInitialPosts} variant="outline">
+                      Thử lại
+                    </Button>
+                  </div>
+                ) : posts.length === 0 ? (
+                  <div className="text-center py-12">
+                    <TrendingUp className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Chưa có bài đăng nào
+                    </h3>
+                    <p className="text-gray-500">
+                      Hãy là người đầu tiên chia sẻ về thú cưng của bạn!
+                    </p>
+                  </div>
+                ) : (
+                  renderPostsWithInfiniteScroll(posts)
+                )}
               </div>
             </TabsContent>
 
             <TabsContent value="following" className="space-y-0">
               <CreatePost myPets={myPets} />
 
-              <div className="text-center py-12">
-                <Users className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Chưa có bài đăng từ người bạn theo dõi
-                </h3>
-                <p className="text-gray-500 mb-4">
-                  Hãy theo dõi thêm người dùng để xem bài đăng của họ tại đây
-                </p>
-                <Button variant="outline">
-                  Khám phá người dùng
-                </Button>
-              </div>
+              {status === 'loading' ? (
+                <PostSkeletonList count={3} />
+              ) : (
+                <div className="text-center py-12">
+                  <Users className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Chưa có bài đăng từ người bạn theo dõi
+                  </h3>
+                  <p className="text-gray-500 mb-4">
+                    Hãy theo dõi thêm người dùng để xem bài đăng của họ tại đây
+                  </p>
+                  <Button variant="outline">
+                    Khám phá người dùng
+                  </Button>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

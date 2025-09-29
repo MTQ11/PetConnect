@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 import { vi } from "date-fns/locale"
@@ -15,14 +15,19 @@ import {
   Verified,
   ChevronLeft,
   ChevronRight,
-  Check
+  Check,
+  Edit,
+  Trash2
 } from "lucide-react"
 import { Post } from "@/types"
 import { DetailPostModal } from "./DetailPostModal"
+import { EditPostModal } from "./EditPostModal"
 import { t } from "@/lib/i18n"
 import api from "@/lib/api/axios"
 import { useRouter } from "next/navigation"
 import { ROUTES } from "@/lib/constants"
+import { useAppSelector, useAppDispatch } from "@/store/hook"
+import { deletePost } from "@/store/slices/newfeedSlice"
 
 interface PostCardProps {
   post: Post,
@@ -31,12 +36,38 @@ interface PostCardProps {
 
 export function PostCard({ post, isDetail = false }: PostCardProps) {
   const router = useRouter()
+  const dispatch = useAppDispatch()
+  const { user: currentUser } = useAppSelector(state => state.auth)
+  
   const [isLiked, setIsLiked] = useState(post.isLikedByCurrentUser)
   const [likeCount, setLikeCount] = useState(post.likeCount)
   const [showFullContent, setShowFullContent] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [openDetailModal, setOpenDetailModal] = useState(false)
+  const [openEditModal, setOpenEditModal] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
   const [copied, setCopied] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Check if current user owns this post
+  const isOwner = currentUser && currentUser.id === post.userId
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showDropdown])
 
   const handleLike = async () => {
     if (isLiked) {
@@ -53,6 +84,25 @@ export function PostCard({ post, isDetail = false }: PostCardProps) {
 
   const handleUserClick = () => {
     router.push(ROUTES.userProfile(post.user.id))
+  }
+
+  const handleEdit = () => {
+    setShowDropdown(false)
+    setOpenEditModal(true)
+  }
+
+  const handleDelete = async () => {
+    if (confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+      try {
+        await dispatch(deletePost(post.id)).unwrap()
+        
+        setShowDropdown(false)
+      } catch (error) {
+        console.error('Failed to delete post:', error)
+        alert('Có lỗi xảy ra khi xóa bài viết')
+      }
+    }
+    setShowDropdown(false)
   }
 
   const formatTimeAgo = (date: Date) => {
@@ -84,7 +134,7 @@ export function PostCard({ post, isDetail = false }: PostCardProps) {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <img
-                src={post.user.avatarUrl || "/api/placeholder/40/40"}
+                src={post.user.avatar || "/api/placeholder/40/40"}
                 alt={post.user.name}
                 className="w-8 h-8 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
                 onClick={handleUserClick}
@@ -97,9 +147,10 @@ export function PostCard({ post, isDetail = false }: PostCardProps) {
                   >
                     {post.user.name}
                   </h3>
-                  {post.user.verified && (
+                  {/* chưa phát triển tính năng bài viết có tích xanh */}
+                  {/* {post.user.verified && (
                     <Verified className="w-3 h-3 text-blue-500" />
-                  )}
+                  )} */}
                 </div>
                 <p className="text-xs text-gray-500">
                   {formatTimeAgo(post.createdAt)}
@@ -107,9 +158,37 @@ export function PostCard({ post, isDetail = false }: PostCardProps) {
               </div>
             </div>
 
-            <Button variant="ghost" size="sm">
-              <MoreHorizontal className="w-3 h-3" />
-            </Button>
+            {/* Dropdown Menu - Only show for post owner */}
+            {isOwner && (
+              <div className="relative" ref={dropdownRef}>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowDropdown(!showDropdown)}
+                >
+                  <MoreHorizontal className="w-3 h-3" />
+                </Button>
+                
+                {showDropdown && (
+                  <div className="absolute right-0 top-8 bg-white rounded-md shadow-lg border z-10 min-w-[120px]">
+                    <button
+                      onClick={handleEdit}
+                      className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Chỉnh sửa
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="flex items-center px-3 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Xóa
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Post Content */}
@@ -282,6 +361,15 @@ export function PostCard({ post, isDetail = false }: PostCardProps) {
       </Card>
       {/* Modal chi tiết bài viết + bình luận */}
       <DetailPostModal open={openDetailModal} onOpenChange={setOpenDetailModal} post={post} />
+      
+      {/* Modal chỉnh sửa bài viết - chỉ hiển thị cho owner */}
+      {isOwner && (
+        <EditPostModal 
+          post={post} 
+          isOpen={openEditModal} 
+          onClose={() => setOpenEditModal(false)} 
+        />
+      )}
     </>
   )
 }

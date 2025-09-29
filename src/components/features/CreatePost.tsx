@@ -11,7 +11,8 @@ import { t } from "@/lib/i18n"
 import { Pet } from "@/types"
 import api from "@/lib/api/axios"
 import { imageUploadToCloudinary } from "@/lib/utils/fetchCloudinary"
-import { useAppSelector } from "@/store/hook"
+import { useAppDispatch, useAppSelector } from "@/store/hook"
+import { addNewPost } from "@/store/slices/newfeedSlice"
 import { ROUTES } from "@/lib/constants"
 
 interface CreatePostProps {
@@ -19,6 +20,7 @@ interface CreatePostProps {
 }
 
 export function CreatePost({ myPets }: CreatePostProps) {
+  const dispatch = useAppDispatch()
   const { user } = useAppSelector(state => state.auth)
   const [content, setContent] = useState("")
   const [openAttachPets, setOpenAttachPets] = useState(false)
@@ -48,12 +50,16 @@ export function CreatePost({ myPets }: CreatePostProps) {
         location: null // Tạm thời để null, có thể mở rộng sau
       }
 
-      await api.post('/posts', payload)
+      const response = await api.post('/posts', payload)
 
-      // Reset form sau khi đăng thành công
-      setContent("")
-      setSelectedPets([])
-      setImages([])
+      if (response.status >= 200 && response.status < 300) {
+        dispatch(addNewPost(response.data))
+
+        // Reset form sau khi đăng thành công
+        setContent("")
+        setSelectedPets([])
+        setImages([])
+      }
     } catch (error) {
       console.log(error)
     }

@@ -118,6 +118,108 @@ export const vi = {
   active: "Đang bán",
   sold: "Đã bán",
 
+  // Pet Management - Quản lý thú cưng
+  viewPetDetails: "Xem chi tiết",
+  editPetAction: "Chỉnh sửa",
+  deletePetAction: "Xóa",
+  hidePetAction: "Ẩn thú cưng",
+  showPetAction: "Hiển thị thú cưng",
+  morePetOptions: "Tùy chọn khác",
+  petHidden: "Ẩn",
+  
+  // Confirm Dialog - Dialog xác nhận
+  confirmTitle: "Xác nhận",
+  cancel: "Hủy",
+  processing: "Đang xử lý...",
+  
+  // Delete Pet Confirmation
+  deletePetTitle: "Xóa thú cưng",
+  deletePetContent: "Bạn có chắc chắn muốn xóa \"{petName}\"? Hành động này không thể hoàn tác.",
+  deletePetConfirm: "Xóa",
+  
+  // Toggle Pet Status Confirmation
+  hidePetTitle: "Ẩn thú cưng",
+  showPetTitle: "Hiển thị thú cưng",
+  hidePetContent: "Bạn có muốn ẩn \"{petName}\" trên trang web?",
+  showPetContent: "Bạn có muốn hiển thị \"{petName}\" trên trang web?",
+  hidePetConfirm: "Ẩn",
+  showPetConfirm: "Hiển thị",
+  
+  // Pet Detail Modal - Modal chi tiết thú cưng
+  petDetailTitle: "Chi tiết thú cưng",
+  petGenderLabel: "Giới tính",
+  petAgeDetail: "Tuổi",
+  petWeightLabel: "Cân nặng",
+  postedTime: "Đăng lúc",
+  speciesBreedInfo: "Thông tin giống loài",
+  speciesLabel: "Loài",
+  breedLabel: "Giống",
+  undefinedBreed: "Không xác định",
+  ownerInfo: "Thông tin chủ sở hữu",
+  verifiedOwner: "Đã xác minh",
+  memberSinceText: "Thành viên từ",
+  noRating: "Chưa có đánh giá",
+  petNotFound: "Không tìm thấy thông tin thú cưng",
+  
+  // Transaction Types Vietnamese
+  transactionSell: "Bán",
+  transactionAdopt: "Nhận nuôi", 
+  transactionExchange: "Trao đổi",
+  transactionNotSell: "Không bán",
+  transactionLost: "Thất lạc",
+  transactionFound: "Tìm thấy",
+  
+  // Edit Pet Modal - Modal chỉnh sửa thú cưng
+  editPetTitle: "Chỉnh sửa thông tin thú cưng",
+  basicInfoSection: "Thông tin cơ bản",
+  petNameInput: "Tên thú cưng",
+  petNamePlaceholder: "Nhập tên thú cưng",
+  ageInput: "Tuổi",
+  ageUnitSelect: "Đơn vị tuổi",
+  genderSelect: "Giới tính",
+  weightInput: "Cân nặng (kg)",
+  weightPlaceholder: "0.0",
+  descriptionInput: "Mô tả",
+  descriptionPlaceholder: "Mô tả chi tiết về thú cưng của bạn...",
+  imagesSection: "Hình ảnh",
+  addImageButton: "Thêm ảnh",
+  maxImagesNote: "Có thể thêm tối đa 6 ảnh",
+  transactionInfoSection: "Thông tin giao dịch",
+  transactionTypeSelect: "Loại giao dịch",
+  priceInput: "Giá (VNĐ)",
+  vaccinatedCheckbox: "Đã tiêm vắc xin",
+  rehomingCheckbox: "Tìm chủ mới",
+  saveChangesButton: "Lưu thay đổi",
+  savingText: "Đang lưu...",
+  
+  // Age Units
+  yearOption: "Tuổi",
+  monthOption: "Tháng", 
+  weekOption: "Tuần",
+  
+  // Gender Options
+  maleOption: "Đực",
+  femaleOption: "Cái",
+  
+  // Transaction Type Options
+  notSellOption: "Không bán",
+  sellOption: "Bán",
+  adoptOption: "Nhận nuôi",
+  exchangeOption: "Trao đổi",
+  lostOption: "Thất lạc",
+  foundOption: "Tìm thấy",
+  
+  // Validation & Error Messages
+  requiredField: "Trường này bắt buộc",
+  updatePetError: "Có lỗi xảy ra khi cập nhật thông tin thú cưng",
+  deletePetError: "Có lỗi xảy ra khi xóa thú cưng",
+  toggleStatusError: "Có lỗi xảy ra khi thay đổi trạng thái thú cưng",
+  
+  // Price Display
+  contactForPrice: "Liên hệ",
+  currencyVND: "VNĐ",
+  viewCountText: "lượt xem",
+
   // Post Pet Form - Form đăng tin
   postYourPet: "Thêm thú cưng",
   createDetailedListing: "Tạo tin đăng chi tiết để tìm ngôi nhà hoàn hảo cho thú cưng của bạn",
@@ -264,7 +366,7 @@ export const vi = {
   minutesAgo: "phút trước",
   seeMore: "Xem thêm",
   seeLess: "Ẩn bớt",
-  viewPetDetails: "Xem chi tiết thú cưng",
+  viewDetailsPet: "Xem chi tiết thú cưng",
   writeComment: "Viết bình luận...",
   newsfeed: "Bảng tin",
   trending: "Thịnh hành",

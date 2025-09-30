@@ -104,7 +104,24 @@ export default function CreatePetPage() {
 
             const payload = { ...formData, images: uploadedUrls }
 
-            api.post('/pets', payload)
+            const response = await api.post('/pets', payload)
+            if(response.status >= 200 && response.status < 300) {
+                setFormData({
+                    name: "",
+                    age: "",
+                    ageUnit: AgeUnit.MONTH,
+                    gender: "",
+                    weight: "",
+                    description: "",
+                    images: [],
+                    speciesId: "",
+                    breedId: "",
+                    customBreedName: "",
+                    isForRehoming: false,
+                    price: 0,
+                    transactionType: TransactionType.NOT_SELL,
+                })
+            }
 
         } catch (error) {
             console.error(error)

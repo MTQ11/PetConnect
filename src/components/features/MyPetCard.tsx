@@ -35,7 +35,9 @@ export function MyPetCard({
           <p className="text-sm text-gray-600">
             {pet.breed.name_vi} • {pet.age} {pet.ageUnit === AgeUnit.YEAR ? t('years') : pet.ageUnit === AgeUnit.MONTH ? t('months') : t('weeks')}
           </p>
-          <p className="text-lg font-bold">${pet.price.toLocaleString()}</p>
+          <p className="text-lg font-bold">
+            {pet.price ? `${pet.price.toLocaleString()} ${t('currencyVND')}` : t('contactForPrice')}
+          </p>
         </div>
       </div>
 
@@ -71,9 +73,9 @@ export function MyPetCard({
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
           <Badge
-            className={pet.isAvailable ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+            className={(pet.isAvailableAtSite ?? true) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
           >
-            {pet.isAvailable ? t('active') : t('sold')}
+            {(pet.isAvailableAtSite ?? true) ? t('active') : t('petHidden')}
           </Badge>
 
           <div className="flex items-center gap-1">
@@ -81,7 +83,7 @@ export function MyPetCard({
               variant="ghost"
               size="sm"
               onClick={() => onViewDetails?.(pet.id)}
-              title="View Details"
+              title={t('viewPetDetails')}
             >
               <Eye className="w-4 h-4" />
             </Button>
@@ -90,7 +92,7 @@ export function MyPetCard({
               variant="ghost"
               size="sm"
               onClick={() => onEdit?.(pet.id)}
-              title="Edit"
+              title={t('editPetAction')}
             >
               <Edit className="w-4 h-4" />
             </Button>
@@ -99,22 +101,22 @@ export function MyPetCard({
               variant="ghost"
               size="sm"
               onClick={() => onToggleStatus?.(pet.id)}
-              title={pet.isAvailable ? "Deactivate" : "Activate"}
+              title={(pet.isAvailableAtSite ?? true) ? t('hidePetAction') : t('showPetAction')}
             >
-              {pet.isAvailable ? '🔒' : '🔓'}
+              {(pet.isAvailableAtSite ?? true) ? '🔒' : '🔓'}
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onDelete?.(pet.id)}
-              title="Delete"
+              title={t('deletePetAction')}
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
 
-            <Button variant="ghost" size="sm" title="More Options">
+            <Button variant="ghost" size="sm" title={t('morePetOptions')}>
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </div>

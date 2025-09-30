@@ -17,9 +17,13 @@ import { PetCard } from "@/components/features/PetCard"
 import { useMyPetsData } from "@/lib/hooks/useMyPetsData"
 import { PostCard } from "@/components/features/PostCard"
 import { EditProfileModal } from "@/components/features/EditProfileModal"
+import { PetDetailModal } from "@/components/features/PetDetailModal"
+import { EditPetModal } from "@/components/features/EditPetModal"
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog"
 import { useAppSelector } from "@/store/hook"
 import { AuthGuardLayout } from '@/components/layout/AuthGuardLayout'
 import { useRouter } from 'next/navigation'
+import { petApi } from '@/lib/api/petApi'
 
 // Mock data
 const messages = [
@@ -56,11 +60,30 @@ export default function ProfilePage() {
   const router = useRouter()
 
   const { user } = useAppSelector((state) => state.auth)
-  const { myPets, loading, error } = useMyPetsData();
+  const { myPets: initialMyPets, loading, error } = useMyPetsData();
+  const [myPets, setMyPets] = useState<Pet[]>([])
   const [myFavoritePets, setMyFavoritePets] = useState<Pet[]>([])
   const [myPostList, setMyPostList] = useState<Post[]>([])
   const [selectedTab, setSelectedTab] = useState("myPostList")
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showPetDetailModal, setShowPetDetailModal] = useState(false)
+  const [showEditPetModal, setShowEditPetModal] = useState(false)
+  const [selectedPetId, setSelectedPetId] = useState<string | null>(null)
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<() => Promise<void> | void>(() => {})
+  const [confirmDialogProps, setConfirmDialogProps] = useState({
+    title: '',
+    content: '',
+    confirmText: 'Xác nhận',
+    type: 'warning' as 'warning' | 'info' | 'success' | 'danger'
+  })
+  const [actionLoading, setActionLoading] = useState(false)
+
+  // Update local pets when initial data changes
+  useEffect(() => {
+    setMyPets(initialMyPets)
+  }, [initialMyPets])
 
   const handleLikeChangeOnProfile = (petId: string, isLiked: boolean) => {
     setMyFavoritePets((prevFavorites) =>
@@ -71,29 +94,86 @@ export default function ProfilePage() {
   }
 
   const handleEditPet = (petId: string) => {
-    // Navigate to edit pet page
-    console.log('Edit pet:', petId)
-  }
-
-  const handleDeletePet = (petId: string) => {
-    // Show confirmation dialog and delete pet
-    if (window.confirm('Are you sure you want to delete this pet?')) {
-      console.log('Delete pet:', petId)
-      // Implement delete logic here
-      // You can call API to delete pet
+    const pet = myPets.find(p => p.id === petId)
+    if (pet) {
+      setSelectedPet(pet)
+      setShowEditPetModal(true)
     }
   }
 
+  const handleDeletePet = (petId: string) => {
+    const pet = myPets.find(p => p.id === petId)
+    if (!pet) return
+
+    setConfirmDialogProps({
+      title: t('deletePetTitle'),
+      content: t('deletePetContent').replace('{petName}', pet.name),
+      confirmText: t('deletePetConfirm'),
+      type: 'danger'
+    })
+    
+    setConfirmAction(() => async () => {
+      setActionLoading(true)
+      try {
+        await petApi.deletePet(petId)
+        // Remove from local state
+        setMyPets(prev => prev.filter(p => p.id !== petId))
+      } catch (error) {
+        console.error('Failed to delete pet:', error)
+        throw new Error(t('deletePetError'))
+      } finally {
+        setActionLoading(false)
+      }
+    })
+    
+    setShowConfirmDialog(true)
+  }
+
   const handleTogglePetStatus = (petId: string) => {
-    // Toggle pet availability status
-    console.log('Toggle pet status:', petId)
-    // Implement toggle status logic here
-    // You can call API to update pet status
+    const pet = myPets.find(p => p.id === petId)
+    if (!pet) return
+
+    const isCurrentlyActive = pet.isAvailableAtSite ?? true
+    const actionText = isCurrentlyActive ? t('hidePetAction') : t('showPetAction')
+    
+    setConfirmDialogProps({
+      title: isCurrentlyActive ? t('hidePetTitle') : t('showPetTitle'),
+      content: (isCurrentlyActive ? t('hidePetContent') : t('showPetContent')).replace('{petName}', pet.name),
+      confirmText: isCurrentlyActive ? t('hidePetConfirm') : t('showPetConfirm'),
+      type: 'warning'
+    })
+    
+    setConfirmAction(() => async () => {
+      setActionLoading(true)
+      try {
+        await petApi.togglePetStatus(petId)
+        // Update local state
+        setMyPets(prev => prev.map(p => 
+          p.id === petId 
+            ? { ...p, isAvailableAtSite: !isCurrentlyActive }
+            : p
+        ))
+      } catch (error) {
+        console.error('Failed to toggle pet status:', error)
+        throw new Error(t('toggleStatusError'))
+      } finally {
+        setActionLoading(false)
+      }
+    })
+    
+    setShowConfirmDialog(true)
   }
 
   const handleViewPetDetails = (petId: string) => {
-    // Navigate to pet details page
-    console.log('View pet details:', petId)
+    setSelectedPetId(petId)
+    setShowPetDetailModal(true)
+  }
+
+  const handleUpdatePetSuccess = (updatedPet: Pet) => {
+    // Update local state with updated pet
+    setMyPets(prev => prev.map(p => 
+      p.id === updatedPet.id ? updatedPet : p
+    ))
   }
 
   useEffect(() => {
@@ -309,6 +389,34 @@ export default function ProfilePage() {
               isOpen={showEditModal}
               onClose={() => setShowEditModal(false)}
               user={user}
+            />
+
+            {/* Pet Detail Modal */}
+            <PetDetailModal
+              isOpen={showPetDetailModal}
+              onClose={() => setShowPetDetailModal(false)}
+              petId={selectedPetId}
+            />
+
+            {/* Edit Pet Modal */}
+            <EditPetModal
+              isOpen={showEditPetModal}
+              onClose={() => setShowEditPetModal(false)}
+              pet={selectedPet}
+              onUpdateSuccess={handleUpdatePetSuccess}
+            />
+
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+              isOpen={showConfirmDialog}
+              onClose={() => setShowConfirmDialog(false)}
+              title={confirmDialogProps.title}
+              content={confirmDialogProps.content}
+              confirmText={confirmDialogProps.confirmText}
+              type={confirmDialogProps.type}
+              confirmVariant={confirmDialogProps.type === 'danger' ? 'destructive' : 'default'}
+              onConfirm={confirmAction}
+              loading={actionLoading}
             />
           </div>
         }
